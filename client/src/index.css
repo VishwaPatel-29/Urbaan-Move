@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-teal: #008080;
+  --color-teal-light: #00B4B4;
+  --color-pink-light: #FFB6C1;
+  --color-pink-dark: #C2185B;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.light {
+  background-color: #ffffff !important;
+  color: #1a1a1a !important;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-teal);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-teal-light);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.5s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+input, textarea, select {
+  font-family: inherit;
+}
+
+.btn-primary {
+  @apply bg-[#00B4B4] text-black font-semibold py-3 px-6 rounded-lg transition-all duration-300 hover:bg-[#FFB6C1] active:scale-95;
+}
+
+.btn-secondary {
+  @apply bg-transparent border-2 border-[#00B4B4] text-[#00B4B4] font-semibold py-3 px-6 rounded-lg transition-all duration-300 hover:bg-[#00B4B4] hover:text-black active:scale-95;
+}
+
+.card {
+  @apply bg-gray-900 rounded-xl p-6 border border-gray-800 transition-all duration-300 hover:border-[#00B4B4];
+}
+
+.light .card {
+  @apply bg-white shadow-lg;
+}
+
+.input-field {
+  @apply w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-[#00B4B4] focus:outline-none transition-colors duration-300;
+}
+
+.light .input-field {
+  @apply bg-gray-100 border-gray-300 text-gray-900 placeholder-gray-500;
+}
+
+.nav-link {
+  @apply text-gray-400 hover:text-[#00B4B4] transition-colors duration-300;
+}
+
+.light .nav-link {
+  @apply text-gray-600 hover:text-[#00B4B4];
+}
+
+.text-gradient {
+  @apply bg-gradient-to-r from-[#00B4B4] to-[#FFB6C1] bg-clip-text text-transparent;
+}
+
+.glass-navbar {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
