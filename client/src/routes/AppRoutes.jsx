@@ -5,6 +5,8 @@ import Home from '../pages/Home.jsx'
 import Login from '../pages/Login.jsx'
 import Register from '../pages/Register.jsx'
 import Dashboard from '../pages/Dashboard.jsx'
+import DriverDashboard from '../pages/DriverDashboard.jsx'
+import AdminDashboard from '../pages/AdminDashboard.jsx'
 import Booking from '../pages/Booking.jsx'
 import Rides from '../pages/Rides.jsx'
 import Profile from '../pages/Profile.jsx'
@@ -21,6 +23,16 @@ function AppRoutes() {
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <Dashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/driver-dashboard" element={
+        <ProtectedRoute>
+          <DriverDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin-dashboard" element={
+        <ProtectedRoute>
+          <AdminDashboard />
         </ProtectedRoute>
       } />
       <Route path="/book" element={

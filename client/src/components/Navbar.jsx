@@ -348,84 +348,45 @@ const Navbar = () => {
                 </Menu>
               </>
             ) : (
-              <>
-                <Button
-                  component={Link}
-                  to="/login"
-                  sx={{
-                    background: 'linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%)',
-                    color: '#fff',
-                    border: '2px solid #9C27B0',
-                    borderRadius: 3,
-                    px: 3,
-                    py: 1,
-                    fontWeight: 600,
-                    position: 'relative',
-                    overflow: 'hidden',
-                    '&:hover': {
-                      background: 'linear-gradient(135deg, #BA68C8 0%, #8E24AA 100%)',
-                      borderColor: '#BA68C8',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 4px 12px rgba(156, 39, 176, 0.4)',
-                    },
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      width: '0',
-                      height: '0',
-                      background: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)',
-                      borderRadius: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      transition: 'all 0.4s',
-                    },
-                    '&:hover::before': {
-                      width: '100%',
-                      height: '100%',
-                    },
-                  }}
-                >
-                  🔑 Login
-                </Button>
-                <Button
-                  component={Link}
-                  to="/register"
-                  sx={{
-                    background: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
-                    color: '#fff',
-                    border: '2px solid #FF9800',
-                    borderRadius: 3,
-                    px: 3,
-                    py: 1,
-                    fontWeight: 600,
-                    ml: 1,
-                    position: 'relative',
-                    overflow: 'hidden',
-                    '&:hover': {
-                      background: 'linear-gradient(135deg, #FFB74D 0%, #FF9800 100%)',
-                      borderColor: '#FFB74D',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 4px 12px rgba(255, 152, 0, 0.4)',
-                    },
-                    '&::after': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: '-100%',
-                      width: '100%',
-                      height: '100%',
-                      background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
-                      transition: 'left 0.5s',
-                    },
-                    '&:hover::after': {
-                      left: '100%',
-                    },
-                  }}
-                >
-                  🎯 Register
-                </Button>
-              </>
+              <Button
+                component={Link}
+                to="/login"
+                sx={{
+                  background: 'linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%)',
+                  color: '#fff',
+                  border: '2px solid #9C27B0',
+                  borderRadius: 3,
+                  px: 3,
+                  py: 1,
+                  fontWeight: 600,
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #BA68C8 0%, #8E24AA 100%)',
+                    borderColor: '#BA68C8',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 12px rgba(156, 39, 176, 0.4)',
+                  },
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    width: '0',
+                    height: '0',
+                    background: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)',
+                    borderRadius: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    transition: 'all 0.4s',
+                  },
+                  '&:hover::before': {
+                    width: '100%',
+                    height: '100%',
+                  },
+                }}
+              >
+                🔑 Login
+              </Button>
             )}
             <ThemeToggle />
           </Box>

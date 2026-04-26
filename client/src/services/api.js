@@ -45,21 +45,47 @@ const apiRequest = async (endpoint, options = {}) => {
 
 // Mock response handler for development
 const getMockResponse = (endpoint, options) => {
+  // Generate user name based on login credentials
+  const generateUserName = (email, role) => {
+    if (email === 'demo@kbd-havya.com') return 'John Employee'
+    if (email === 'driver@kbd-havya.com') return 'Mike Driver'
+    if (email === 'admin@kbd-havya.com') return 'Sarah Admin'
+    // Extract name from email or use role-based name
+    const emailPrefix = email.split('@')[0]
+    return emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1).replace('.', ' ')
+  }
+
   const mockResponses = {
-    '/auth/login': {
-      success: true,
-      data: {
-        user: {
-          id: '1',
-          name: 'Demo User',
-          email: 'demo@kbd-havya.com',
-          role: 'user',
-          phone: '+1234567890',
-          company: 'TechCorp Inc.',
-        },
-        token: 'mock-jwt-token-123456789'
-      },
-      message: 'Login successful'
+    '/auth/login': (options) => {
+      try {
+        // Parse the request body to get the actual credentials
+        const requestBody = options.body ? JSON.parse(options.body) : {}
+        const email = requestBody.email || 'demo@kbd-havya.com'
+        const name = requestBody.name || 'Demo User'
+        const role = requestBody.role || 'employee'
+        
+        return {
+          success: true,
+          data: {
+            user: {
+              id: '1',
+              name: name, // Use the actual name from the login form
+              email: email,
+              role: role,
+              phone: '+1234567890',
+              company: 'TechCorp Inc.',
+            },
+            token: 'mock-jwt-token-123456789'
+          },
+          message: 'Login successful'
+        }
+      } catch (error) {
+        console.error('Mock API login error:', error)
+        return {
+          success: false,
+          message: 'Login failed'
+        }
+      }
     },
     '/auth/register': {
       success: true,
@@ -121,7 +147,12 @@ const getMockResponse = (endpoint, options) => {
   // Simulate network delay
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(mockResponses[endpoint] || { success: false, message: 'Endpoint not found' })
+      const response = mockResponses[endpoint]
+      if (typeof response === 'function') {
+        resolve(response(options))
+      } else {
+        resolve(response || { success: false, message: 'Endpoint not found' })
+      }
     }, 500)
   })
 }
