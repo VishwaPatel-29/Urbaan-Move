@@ -12,10 +12,9 @@ const getHeaders = () => {
 
 // Generic API request handler
 const apiRequest = async (endpoint, options = {}) => {
-  // For development, return mock responses if backend is not available
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true') {
-    return getMockResponse(endpoint, options)
-  }
+  // Always use mock responses for now since backend isn't deployed
+  console.log('Using mock response for:', endpoint)
+  return getMockResponse(endpoint, options)
 
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -34,12 +33,9 @@ const apiRequest = async (endpoint, options = {}) => {
     return await response.json()
   } catch (error) {
     console.error('API request failed:', error)
-    // For development, return mock response on error
-    if (import.meta.env.DEV) {
-      console.warn('Using mock response due to API failure')
-      return getMockResponse(endpoint, options)
-    }
-    throw error
+    // Always return mock response on error for now
+    console.warn('Using mock response due to API failure')
+    return getMockResponse(endpoint, options)
   }
 }
 
@@ -87,20 +83,38 @@ const getMockResponse = (endpoint, options) => {
         }
       }
     },
-    '/auth/register': {
-      success: true,
-      data: {
-        user: {
-          id: '2',
-          name: 'New User',
-          email: 'user@urbanmove.com',
-          role: 'user',
-          phone: '+1234567890',
-          company: 'InnovateTech',
-        },
-        token: 'mock-jwt-token-987654321'
-      },
-      message: 'Registration successful'
+    '/auth/register': (options) => {
+      try {
+        // Parse the request body to get the actual user data
+        const requestBody = options.body ? JSON.parse(options.body) : {}
+        const name = requestBody.name || 'New User'
+        const email = requestBody.email || 'user@urbanmove.com'
+        const phone = requestBody.phone || '+1234567890'
+        const company = requestBody.company || 'InnovateTech'
+        
+        return {
+          success: true,
+          data: {
+            user: {
+              id: '2',
+              name: name, // Use the actual name from registration form
+              email: email,
+              role: 'employee',
+              phone: phone,
+              company: company,
+              employeeId: requestBody.employeeId || 'EMP001'
+            },
+            token: 'mock-jwt-token-987654321'
+          },
+          message: 'Registration successful'
+        }
+      } catch (error) {
+        console.error('Mock API registration error:', error)
+        return {
+          success: false,
+          message: 'Registration failed'
+        }
+      }
     },
     '/auth/google-login': {
       success: true,
