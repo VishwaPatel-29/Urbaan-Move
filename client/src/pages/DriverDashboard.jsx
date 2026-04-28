@@ -25,7 +25,7 @@ import {
   TextField,
 } from '@mui/material'
 import {
-  DirectionsBus,
+  DirectionsCar,
   CheckCircle,
   Cancel,
   Navigation,
@@ -187,7 +187,7 @@ const DriverDashboard = () => {
                     </Box>
                   ) : (
                     <Box sx={{ textAlign: 'center', py: 4 }}>
-                      <DirectionsBus sx={{ fontSize: 48, color: '#333', mb: 2 }} />
+                      <DirectionsCar sx={{ fontSize: 48, color: '#333', mb: 2 }} />
                       <Typography variant="body1" sx={{ color: '#666' }}>
                         No active ride. Accept a request below.
                       </Typography>

@@ -6,6 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline'
 import { store } from './features/store.js'
 import AppRoutes from './routes/AppRoutes.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
+import { useAnalytics } from './utils/analytics.js'
 
 const theme = createTheme({
   palette: {
@@ -26,12 +27,15 @@ const theme = createTheme({
   },
 })
 
-function App() {
+function AppContent() {
+  // Initialize Google Analytics with your tracking ID
+  useAnalytics(import.meta.env.VITE_GA_TRACKING_ID || 'GA_MEASUREMENT_ID')
+
   return (
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AuthProvider>
             <AppRoutes />
           </AuthProvider>
@@ -39,6 +43,10 @@ function App() {
       </ThemeProvider>
     </Provider>
   )
+}
+
+function App() {
+  return <AppContent />
 }
 
 export default App

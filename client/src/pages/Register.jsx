@@ -14,6 +14,7 @@ import {
   StepLabel,
   CircularProgress,
   Divider,
+  useTheme,
 } from '@mui/material'
 import {
   Visibility,
@@ -66,12 +67,13 @@ const Register = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const loading = useSelector((state) => state.auth.loading)
+  const muiTheme = useTheme()
   const [activeStep, setActiveStep] = useState(0)
   const [showPassword, setShowPassword] = useState(false)
   const [registerSuccess, setRegisterSuccess] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
   
-  const savedProgress = getSessionItem('kbd-havya-register-progress')
+  const savedProgress = getSessionItem('urbanmove-register-progress')
   const [formData, setFormData] = useState(
     savedProgress || { name: '', phone: '', email: '', password: '', confirmPassword: '', company: '', employeeId: '' }
   )
@@ -81,7 +83,7 @@ const Register = () => {
   const handleNext = async (values) => {
     const newFormData = { ...formData, ...values }
     setFormData(newFormData)
-    setSessionItem('kbd-havya-register-progress', newFormData)
+    setSessionItem('urbanmove-register-progress', newFormData)
 
     if (activeStep === steps.length - 1) {
       try {
@@ -90,9 +92,9 @@ const Register = () => {
         const { user, token } = response.data
         dispatch(setCredentials({ user, token }))
         setRegisterSuccess(true)
-        sessionStorage.removeItem('kbd-havya-register-progress')
+        sessionStorage.removeItem('urbanmove-register-progress')
         setTimeout(() => {
-          toast.success('Welcome to KBD-Havya!')
+          toast.success('Welcome to UrbanMove!')
           navigate('/dashboard')
         }, 1500)
       } catch (err) {
@@ -133,7 +135,7 @@ const Register = () => {
       dispatch(setCredentials({ user, token }))
       setRegisterSuccess(true)
       
-      toast.success('Welcome to KBD-Havya!', { id: 'google-auth' })
+      toast.success('Welcome to UrbanMove!', { id: 'google-auth' })
       
       setTimeout(() => {
         navigate('/dashboard')
@@ -154,7 +156,7 @@ const Register = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#000',
+          background: muiTheme.palette.mode === 'dark' ? '#000' : '#f8f9fa',
         }}
       >
         <LottieSuccess />
@@ -165,11 +167,11 @@ const Register = () => {
   return (
     <>
       <Helmet>
-        <title>Sign Up | KBD-Havya</title>
-        <meta name="description" content="Create your KBD-Havya account and start commuting smarter." />
+        <title>Sign Up | UrbanMove</title>
+        <meta name="description" content="Create your UrbanMove account and start commuting smarter." />
       </Helmet>
 
-      <Box sx={{ minHeight: '100vh', background: '#000', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ minHeight: '100vh', background: muiTheme.palette.mode === 'dark' ? '#000' : '#f8f9fa', display: 'flex', flexDirection: 'column' }}>
         <Navbar />
 
         <Box
@@ -178,8 +180,8 @@ const Register = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            px: 2,
-            py: 8,
+            px: { xs: 2, sm: 3, md: 4 },
+            py: { xs: 4, sm: 6, md: 8 },
           }}
         >
           <motion.div
@@ -190,20 +192,39 @@ const Register = () => {
             <Box
               sx={{
                 width: '100%',
-                maxWidth: 480,
-                p: { xs: 3, md: 5 },
+                maxWidth: { xs: '100%', sm: '480px', md: '500px' },
+                p: { xs: 3, sm: 4, md: 5 },
                 borderRadius: 3,
-                background: '#1a1a1a',
-                border: '1px solid #333',
+                background: muiTheme.palette.mode === 'dark' ? '#1a1a1a' : '#ffffff',
+                border: muiTheme.palette.mode === 'dark' ? '1px solid #333' : '1px solid #e0e0e0',
+                boxShadow: muiTheme.palette.mode === 'dark'
+                  ? '0 20px 40px rgba(0, 0, 0, 0.8)'
+                  : '0 20px 40px rgba(0, 0, 0, 0.1)',
               }}
             >
+              {/* UrbanMove Logo */}
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+                <Box
+                  component="img"
+                  src="/logo.svg"
+                  alt="UrbanMove"
+                  sx={{
+                    height: { xs: '45px', sm: '50px', md: '55px' },
+                    width: 'auto',
+                  }}
+                />
+              </Box>
+
               <Typography
                 variant="h4"
                 sx={{
                   mb: 1,
                   fontWeight: 700,
                   textAlign: 'center',
-                  background: 'linear-gradient(135deg, #00B4B4 0%, #FFB6C1 100%)',
+                  fontSize: { xs: '1.8rem', sm: '2rem', md: '2.2rem' },
+                  background: muiTheme.palette.mode === 'dark'
+                    ? 'linear-gradient(135deg, #00B4B4 0%, #FFB6C1 100%)'
+                    : 'linear-gradient(135deg, #008080 0%, #C2185B 100%)',
                   backgroundClip: 'text',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
@@ -213,7 +234,7 @@ const Register = () => {
               </Typography>
               <Typography
                 variant="body2"
-                sx={{ mb: 4, textAlign: 'center', color: '#a0a0a0' }}
+                sx={{ mb: 4, textAlign: 'center', color: muiTheme.palette.mode === 'dark' ? '#a0a0a0' : '#666666' }}
               >
                 Step {activeStep + 1} of {steps.length}: {steps[activeStep]}
               </Typography>

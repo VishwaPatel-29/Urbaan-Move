@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import {
   AppBar,
   Toolbar,
@@ -18,17 +18,25 @@ import {
   ListItemText,
   useTheme,
   useMediaQuery,
+  TextField,
+  InputAdornment,
+  Tooltip,
+  Divider,
+  ListItemButton,
 } from '@mui/material'
 import {
   Menu as MenuIcon,
   Notifications,
   AccountCircle,
-  DirectionsBus,
   Home,
-  CalendarToday,
   Person,
   Logout,
   Settings,
+  Search,
+  Dashboard,
+  CalendarMonth,
+  DirectionsBus,
+  AdminPanelSettings,
 } from '@mui/icons-material'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectUser, selectIsAuthenticated, logout } from '../features/authSlice'
@@ -42,69 +50,91 @@ const Navbar = () => {
   const location = useLocation()
   const dispatch = useDispatch()
 
-  const [anchorEl, setAnchorEl] = useState(null)
+  const [profileAnchor, setProfileAnchor] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [notificationAnchor, setNotificationAnchor] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const user = useSelector(selectUser)
   const isAuthenticated = useSelector(selectIsAuthenticated)
   const unreadCount = useSelector(selectUnreadCount)
 
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget)
+  const handleProfileMenuOpen = (event) => {
+    setProfileAnchor(event.currentTarget)
   }
 
-  const handleMenuClose = () => {
-    setAnchorEl(null)
+  const handleProfileMenuClose = () => {
+    setProfileAnchor(null)
   }
 
   const handleLogout = () => {
     dispatch(logout())
     navigate('/')
-    handleMenuClose()
+    handleProfileMenuClose()
   }
 
   const handleMobileMenuToggle = () => {
     setMobileMenuOpen(!mobileMenuOpen)
   }
 
+  const handleNotificationOpen = (event) => {
+    setNotificationAnchor(event.currentTarget)
+  }
+
+  const handleNotificationClose = () => {
+    setNotificationAnchor(null)
+  }
+
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value)
+  }
+
+  const handleSearchSubmit = (event) => {
+    if (event.key === 'Enter' && searchQuery.trim()) {
+      console.log('Searching for:', searchQuery)
+    }
+  }
+
   const menuItems = [
-    { text: 'Home', icon: <Home />, path: '/home' },
-    { text: 'Dashboard', icon: <DirectionsBus />, path: '/dashboard' },
-    { text: 'Book Ride', icon: <CalendarToday />, path: '/book' },
-    { text: 'My Rides', icon: <CalendarToday />, path: '/rides' },
+    { text: 'Dashboard', icon: <Dashboard />, path: '/dashboard' },
+    { text: 'Book Ride', icon: <CalendarMonth />, path: '/book' },
+    { text: 'My Rides', icon: <DirectionsBus />, path: '/rides' },
     { text: 'Profile', icon: <Person />, path: '/profile' },
   ]
 
   const drawer = (
-    <Box onClick={handleMobileMenuToggle} sx={{ textAlign: 'center', py: 2 }}>
-      <Typography variant="h6" sx={{ color: '#00B4B4', fontWeight: 700, mb: 2 }}>
-        KBD-Havya
-      </Typography>
+    <Box sx={{ width: 280, py: 2 }}>
+      <Box sx={{ px: 3, mb: 3 }}>
+        <Typography variant="h6" sx={{ fontWeight: 600, color: '#fff' }}>
+          UrbanMove
+        </Typography>
+        <Typography variant="body2" sx={{ color: '#ccc' }}>
+          Corporate Shuttle Platform
+        </Typography>
+      </Box>
+      <Divider sx={{ mb: 2, borderColor: 'rgba(255,255,255,0.2)' }} />
       <List>
         {menuItems.map((item) => (
-          <ListItem
-            key={item.text}
-            component={Link}
-            to={item.path}
-            selected={location.pathname === item.path}
-            sx={{
-              '&.Mui-selected': {
-                backgroundColor: 'rgba(0, 180, 180, 0.1)',
-                borderLeft: '3px solid #00B4B4',
-              },
-            }}
-          >
-            <ListItemIcon sx={{ color: location.pathname === item.path ? '#00B4B4' : '#666' }}>
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText
-              primary={item.text}
+          <ListItem key={item.text} disablePadding>
+            <ListItemButton
+              onClick={() => navigate(item.path)}
+              selected={location.pathname === item.path}
               sx={{
-                '& .MuiListItemText-primary': {
-                  color: location.pathname === item.path ? '#00B4B4' : '#fff',
+                '&.Mui-selected': {
+                  backgroundColor: 'rgba(0, 180, 180, 0.2)',
+                  color: '#00B4B4',
+                  '& .MuiListItemIcon-root': {
+                    color: '#00B4B4',
+                  },
                 },
+                mx: 1,
+                borderRadius: 1,
+                color: '#fff',
               }}
-            />
+            >
+              <ListItemIcon sx={{ color: '#ccc' }}>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
           </ListItem>
         ))}
       </List>
@@ -122,294 +152,277 @@ const Navbar = () => {
           boxShadow: 'none',
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ minHeight: 64 }}>
           {isMobile && (
             <IconButton
               color="inherit"
               aria-label="open drawer"
               onClick={handleMobileMenuToggle}
               edge="start"
-              sx={{ mr: 2 }}
+              sx={{ mr: 2, color: '#fff' }}
             >
               <MenuIcon />
             </IconButton>
           )}
 
-          <Typography
-            variant="h6"
-            component={Link}
-            to="/"
+          {/* Logo */}
+          <Box
+            onClick={() => navigate('/')}
             sx={{
-              flexGrow: 1,
-              textDecoration: 'none',
-              color: '#00B4B4',
-              fontWeight: 700,
-              fontSize: { xs: '1.2rem', sm: '1.5rem' },
+              display: 'flex',
+              alignItems: 'center',
+              cursor: 'pointer',
+              mr: 'auto',
             }}
           >
-            🚌 KBD-Havya
-          </Typography>
+            <Box
+              component="img"
+              src="/logo.svg"
+              alt="UrbanMove"
+              sx={{
+                height: 60,
+                width: 'auto',
+              }}
+            />
+          </Box>
 
+          {/* Right Side Navigation Items */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {/* Quick Actions - Desktop */}
             {!isMobile && (
               <>
                 <Button
-                  component={Link}
-                  to="/"
+                  onClick={() => navigate('/dashboard')}
                   sx={{
-                    background: location.pathname === '/' 
-                      ? 'linear-gradient(135deg, #00B4B4 0%, #008080 100%)' 
-                      : 'transparent',
-                    color: location.pathname === '/' ? '#fff' : '#00B4B4',
-                    border: '2px solid #00B4B4',
-                    borderRadius: 3,
-                    px: 3,
-                    py: 1,
-                    fontWeight: 600,
-                    position: 'relative',
-                    overflow: 'hidden',
+                    color: location.pathname === '/dashboard' ? '#00B4B4' : 'rgba(255, 255, 255, 0.8)',
+                    fontWeight: 500,
+                    textTransform: 'none',
+                    px: 2,
                     '&:hover': {
-                      background: location.pathname === '/' 
-                        ? 'linear-gradient(135deg, #FFB6C1 0%, #C2185B 100%)' 
-                        : 'rgba(0, 180, 180, 0.1)',
-                      borderColor: location.pathname === '/' ? '#FFB6C1' : '#FFB6C1',
-                      color: location.pathname === '/' ? '#fff' : '#FFB6C1',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 4px 12px rgba(0, 180, 180, 0.3)',
-                    },
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: '-100%',
-                      width: '100%',
-                      height: '100%',
-                      background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
-                      transition: 'left 0.5s',
-                    },
-                    '&:hover::before': {
-                      left: '100%',
+                      backgroundColor: 'rgba(0, 180, 180, 0.1)',
+                      color: '#00B4B4',
                     },
                   }}
                 >
-                  🏠 Home
+                  Dashboard
                 </Button>
                 <Button
-                  component={Link}
-                  to="/rides"
+                  onClick={() => navigate('/rides')}
                   sx={{
-                    background: location.pathname === '/rides' 
-                      ? 'linear-gradient(135deg, #FF6B6B 0%, #C2185B 100%)' 
-                      : 'transparent',
-                    color: location.pathname === '/rides' ? '#fff' : '#FF6B6B',
-                    border: '2px solid #FF6B6B',
-                    borderRadius: 3,
-                    px: 3,
-                    py: 1,
-                    fontWeight: 600,
-                    position: 'relative',
-                    overflow: 'hidden',
+                    color: location.pathname === '/rides' ? '#00B4B4' : 'rgba(255, 255, 255, 0.8)',
+                    fontWeight: 500,
+                    textTransform: 'none',
+                    px: 2,
                     '&:hover': {
-                      background: location.pathname === '/rides' 
-                        ? 'linear-gradient(135deg, #FFB6C1 0%, #FF1493 100%)' 
-                        : 'rgba(255, 107, 107, 0.1)',
-                      borderColor: '#FFB6C1',
-                      color: '#FFB6C1',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 4px 12px rgba(255, 107, 107, 0.3)',
-                    },
-                    '&::after': {
-                      content: '""',
-                      position: 'absolute',
-                      bottom: 0,
-                      left: 0,
-                      width: '0%',
-                      height: '2px',
-                      background: '#FFB6C1',
-                      transition: 'width 0.3s',
-                    },
-                    '&:hover::after': {
-                      width: '100%',
+                      backgroundColor: 'rgba(0, 180, 180, 0.1)',
+                      color: '#00B4B4',
                     },
                   }}
                 >
-                  🚗 My Rides
+                  My Rides
                 </Button>
                 <Button
-                  component={Link}
-                  to="/book"
+                  onClick={() => navigate('/book')}
+                  variant="contained"
                   sx={{
-                    background: location.pathname === '/book' 
-                      ? 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)' 
-                      : 'transparent',
-                    color: location.pathname === '/book' ? '#fff' : '#4CAF50',
-                    border: '2px solid #4CAF50',
-                    borderRadius: 3,
+                    backgroundColor: '#00B4B4',
+                    color: 'white',
+                    fontWeight: 500,
+                    textTransform: 'none',
                     px: 3,
-                    py: 1,
-                    fontWeight: 600,
-                    position: 'relative',
-                    overflow: 'hidden',
                     '&:hover': {
-                      background: location.pathname === '/book' 
-                        ? 'linear-gradient(135deg, #8BC34A 0%, #689F38 100%)' 
-                        : 'rgba(76, 175, 80, 0.1)',
-                      borderColor: '#8BC34A',
-                      color: '#8BC34A',
-                      transform: 'translateY(-2px) rotateX(5deg)',
-                      boxShadow: '0 6px 16px rgba(76, 175, 80, 0.4)',
-                    },
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      width: '0',
-                      height: '0',
-                      background: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)',
-                      borderRadius: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      transition: 'all 0.4s',
-                    },
-                    '&:hover::before': {
-                      width: '100%',
-                      height: '100%',
+                      backgroundColor: '#008080',
                     },
                   }}
                 >
-                  📅 Book Ride
+                  Book a Ride
                 </Button>
               </>
             )}
 
-            {isAuthenticated ? (
-              <>
-                <IconButton color="inherit" component={Link} to="/dashboard">
-                  <Badge badgeContent={unreadCount} color="error">
-                    <Notifications />
-                  </Badge>
-                </IconButton>
-
-                <IconButton
-                  onClick={handleMenuOpen}
-                  sx={{ p: 0 }}
-                >
-                  <Avatar
-                    sx={{
-                      width: 32,
-                      height: 32,
-                      bgcolor: '#00B4B4',
-                      fontSize: '0.875rem',
-                    }}
-                  >
-                    {user?.name?.charAt(0).toUpperCase() || 'U'}
-                  </Avatar>
-                </IconButton>
-
-                <Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                  PaperProps={{
-                    sx: {
-                      background: '#1a1a1a',
-                      border: '1px solid rgba(0, 180, 180, 0.2)',
-                      mt: 1,
-                    },
-                  }}
-                >
-                  <MenuItem component={Link} to="/profile" onClick={handleMenuClose}>
-                    <ListItemIcon>
-                      <Person sx={{ color: '#00B4B4' }} />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Profile"
-                      sx={{ '& .MuiListItemText-primary': { color: '#fff' } }}
-                    />
-                  </MenuItem>
-                  <MenuItem component={Link} to="/dashboard" onClick={handleMenuClose}>
-                    <ListItemIcon>
-                      <DirectionsBus sx={{ color: '#00B4B4' }} />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Dashboard"
-                      sx={{ '& .MuiListItemText-primary': { color: '#fff' } }}
-                    />
-                  </MenuItem>
-                  <MenuItem onClick={handleLogout}>
-                    <ListItemIcon>
-                      <Logout sx={{ color: '#FF6B6B' }} />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Logout"
-                      sx={{ '& .MuiListItemText-primary': { color: '#FF6B6B' } }}
-                    />
-                  </MenuItem>
-                </Menu>
-              </>
-            ) : (
-              <Button
-                component={Link}
-                to="/login"
+            {/* Notifications */}
+            <Tooltip title="Notifications">
+              <IconButton
+                color="inherit"
+                onClick={() => navigate('/notifications')}
                 sx={{
-                  background: 'linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%)',
-                  color: '#fff',
-                  border: '2px solid #9C27B0',
-                  borderRadius: 3,
-                  px: 3,
-                  py: 1,
-                  fontWeight: 600,
-                  position: 'relative',
-                  overflow: 'hidden',
+                  color: 'rgba(255, 255, 255, 0.8)',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #BA68C8 0%, #8E24AA 100%)',
-                    borderColor: '#BA68C8',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 4px 12px rgba(156, 39, 176, 0.4)',
-                  },
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    width: '0',
-                    height: '0',
-                    background: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)',
-                    borderRadius: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    transition: 'all 0.4s',
-                  },
-                  '&:hover::before': {
-                    width: '100%',
-                    height: '100%',
+                    backgroundColor: 'rgba(0, 180, 180, 0.1)',
+                    color: '#00B4B4',
                   },
                 }}
               >
-                🔑 Login
+                <Badge badgeContent={unreadCount} color="error">
+                  🔔
+                </Badge>
+              </IconButton>
+            </Tooltip>
+
+            {/* Settings */}
+            <Tooltip title="Settings">
+              <IconButton
+                color="inherit"
+                onClick={() => navigate('/settings')}
+                sx={{
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 180, 180, 0.1)',
+                    color: '#00B4B4',
+                  },
+                }}
+              >
+                ⚙️
+              </IconButton>
+            </Tooltip>
+
+            {/* Login Button */}
+            {!isAuthenticated && (
+              <Button
+                onClick={() => navigate('/login')}
+                variant="outlined"
+                sx={{
+                  borderColor: '#00B4B4',
+                  color: '#00B4B4',
+                  fontWeight: 500,
+                  textTransform: 'none',
+                  px: 3,
+                  '&:hover': {
+                      backgroundColor: 'rgba(0, 180, 180, 0.1)',
+                      borderColor: '#00B4B4',
+                  },
+                }}
+              >
+                Login
               </Button>
             )}
+
+            {/* User Profile */}
+            {isAuthenticated && (
+              <>
+                <Tooltip title="Profile">
+                  <IconButton
+                    onClick={handleProfileMenuOpen}
+                    sx={{
+                      ml: 1,
+                      '&:hover': {
+                        backgroundColor: 'rgba(0, 180, 180, 0.1)',
+                      },
+                    }}
+                  >
+                    <Avatar
+                      src={user?.avatar}
+                      alt={user?.name}
+                      sx={{ width: 36, height: 36 }}
+                    >
+                      {user?.name?.charAt(0) || <AccountCircle />}
+                    </Avatar>
+                  </IconButton>
+                </Tooltip>
+
+                {/* Profile Menu */}
+                <Menu
+                  anchorEl={profileAnchor}
+                  open={Boolean(profileAnchor)}
+                  onClose={handleProfileMenuClose}
+                  PaperProps={{
+                    sx: {
+                      mt: 1,
+                      minWidth: 200,
+                      backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                      backdropFilter: 'blur(10px)',
+                      border: '1px solid rgba(0, 180, 180, 0.2)',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                    }
+                  }}
+                >
+                  <Box sx={{ px: 2, py: 1 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#fff' }}>
+                      {user?.name || 'User'}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#ccc', fontSize: '0.875rem' }}>
+                      {user?.email || 'user@example.com'}
+                    </Typography>
+                  </Box>
+                  <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)' }} />
+                  <MenuItem onClick={() => { navigate('/profile'); handleProfileMenuClose(); }} sx={{ color: '#fff' }}>
+                    <Person sx={{ mr: 1 }} /> Profile
+                  </MenuItem>
+                  <MenuItem onClick={() => { navigate('/settings'); handleProfileMenuClose(); }} sx={{ color: '#fff' }}>
+                    <Settings sx={{ mr: 1 }} /> Settings
+                  </MenuItem>
+                  {user?.role === 'admin' && (
+                    <MenuItem onClick={() => { navigate('/admin'); handleProfileMenuClose(); }} sx={{ color: '#fff' }}>
+                      <AdminPanelSettings sx={{ mr: 1 }} /> Admin Panel
+                    </MenuItem>
+                  )}
+                  <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)' }} />
+                  <MenuItem onClick={handleLogout} sx={{ color: '#fff' }}>
+                    <Logout sx={{ mr: 1 }} /> Logout
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
+
+            {/* Theme Toggle - Always at the end */}
             <ThemeToggle />
           </Box>
         </Toolbar>
       </AppBar>
 
+      {/* Mobile Drawer */}
       <Drawer
         anchor="left"
         open={mobileMenuOpen}
         onClose={handleMobileMenuToggle}
-        ModalProps={{
-          keepMounted: true,
-        }}
-        sx={{
-          display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': {
-            background: '#0a0a0a',
+        PaperProps={{
+          sx: {
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            backdropFilter: 'blur(10px)',
             borderRight: '1px solid rgba(0, 180, 180, 0.2)',
-          },
+          }
         }}
       >
         {drawer}
       </Drawer>
+
+      {/* Notifications Popover */}
+      {isAuthenticated && (
+        <Menu
+          anchorEl={notificationAnchor}
+          open={Boolean(notificationAnchor)}
+          onClose={handleNotificationClose}
+          PaperProps={{
+            sx: {
+              mt: 1,
+              minWidth: 320,
+              maxWidth: 400,
+              maxHeight: 400,
+              backgroundColor: 'rgba(0, 0, 0, 0.95)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(0, 180, 180, 0.2)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            }
+          }}
+        >
+          <Box sx={{ px: 2, py: 1 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#fff' }}>
+              Notifications
+            </Typography>
+          </Box>
+          <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)' }} />
+          <MenuItem onClick={handleNotificationClose} sx={{ color: '#fff' }}>
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                No new notifications
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#ccc' }}>
+                You're all caught up!
+              </Typography>
+            </Box>
+          </MenuItem>
+        </Menu>
+      )}
     </>
   )
 }

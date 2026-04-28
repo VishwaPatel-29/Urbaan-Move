@@ -1,4 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
+import { useMemo } from 'react'
 import { selectTheme, toggleTheme, setTheme } from '../features/uiSlice'
 
 export const useTheme = () => {

@@ -13,14 +13,14 @@ const GoogleMapComponent = lazy(() =>
   import('./GoogleMapComponent').catch(() => ({
     default: () => (
       <Box sx={{ 
-        height: '400px', 
+        height: { xs: '300px', sm: '400px' }, 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
-        background: '#1a1a1a',
+        background: theme === 'dark' ? '#1a1a1a' : '#f8f9fa',
         borderRadius: 2,
       }}>
-        <Typography sx={{ color: '#666' }}>
+        <Typography sx={{ color: theme === 'dark' ? '#666' : '#999' }}>
           Maps unavailable
         </Typography>
       </Box>
@@ -38,22 +38,22 @@ const LiveMap = () => {
   // Show fallback when Google Maps is disabled
   if (shouldDisableMaps) {
     return (
-      <Card sx={{ mb: 3 }}>
+      <Card sx={{ mb: { xs: 2, sm: 3 } }}>
         <CardContent sx={{ p: 0 }}>
-          <Box sx={{ p: 2 }}>
+          <Box sx={{ p: { xs: 2, sm: 3 } }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <DirectionsBus sx={{ color: '#00B4B4' }} />
-              <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              <DirectionsBus sx={{ color: theme === 'dark' ? '#00B4B4' : '#008080' }} />
+              <Typography variant="h6" sx={{ fontWeight: 600, color: theme === 'dark' ? '#fff' : '#1a1a1a' }}>
                 Live Map
               </Typography>
             </Box>
-            <Typography variant="body2" sx={{ color: '#666' }}>
+            <Typography variant="body2" sx={{ color: theme === 'dark' ? '#666' : '#999' }}>
               Track your shuttle and nearby vehicles
             </Typography>
           </Box>
 
           <Box sx={{ 
-            height: '400px', 
+            height: { xs: '300px', sm: '400px' }, 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center',
@@ -64,12 +64,12 @@ const LiveMap = () => {
             position: 'relative',
             overflow: 'hidden'
           }}>
-            <Box sx={{ textAlign: 'center', px: 3 }}>
-              <LocationOn sx={{ fontSize: 64, color: '#666', mb: 2 }} />
-              <Typography variant="h6" sx={{ mb: 1, color: '#fff' }}>
+            <Box sx={{ textAlign: 'center', px: { xs: 2, sm: 3 } }}>
+              <LocationOn sx={{ fontSize: { xs: 48, sm: 64 }, color: theme === 'dark' ? '#666' : '#999', mb: 2 }} />
+              <Typography variant="h6" sx={{ mb: 1, color: theme === 'dark' ? '#fff' : '#1a1a1a' }}>
                 Map Feature Disabled
               </Typography>
-              <Typography variant="body2" sx={{ mb: 3, color: '#666' }}>
+              <Typography variant="body2" sx={{ mb: 3, color: theme === 'dark' ? '#666' : '#999' }}>
                 Google Maps is not available in this demo. You can still use all other features of the app.
               </Typography>
               <Alert severity="info" sx={{ mb: 2, textAlign: 'left', maxWidth: '500px' }}>

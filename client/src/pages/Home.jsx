@@ -13,8 +13,8 @@ const Home = () => {
   return (
     <>
       <Helmet>
-        <title>Home | KBD-Havya</title>
-        <meta name="description" content="Welcome to KBD-Havya - Your Smart Commute Dashboard" />
+        <title>Home | UrbanMove</title>
+        <meta name="description" content="Welcome to UrbanMove - Your Smart Commute Dashboard" />
       </Helmet>
 
       <Box

@@ -1,13 +1,13 @@
 import axios from 'axios'
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'demo'
-const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'kbd-havya'
+const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'urbanmove'
 
 const cloudinaryApi = axios.create({
   baseURL: `https://api.cloudinary.com/v1_1/${CLOUD_NAME}`,
 })
 
-export const uploadToCloudinary = async (file, folder = 'kbd-havya') => {
+export const uploadToCloudinary = async (file, folder = 'urbanmove') => {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('upload_preset', UPLOAD_PRESET)

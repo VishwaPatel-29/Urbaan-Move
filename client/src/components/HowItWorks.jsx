@@ -79,7 +79,7 @@ const HowItWorks = () => {
               color: theme === 'dark' ? '#a0a0a0' : '#666',
             }}
           >
-            Get started with KBD-Havya in four simple steps.
+            Get started with UrbanMove in four simple steps.
           </Typography>
         </motion.div>
 

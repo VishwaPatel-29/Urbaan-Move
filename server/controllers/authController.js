@@ -3,7 +3,7 @@ const { generateToken, generateRefreshToken } = require('../utils/jwtUtils')
 
 const demoUsers = {
   employee: {
-    email: 'demo@kbd-havya.com',
+    email: 'demo@urbanmove.com',
     password: 'Demo1234',
     name: 'Demo Employee',
     role: 'employee',
@@ -12,19 +12,19 @@ const demoUsers = {
     phone: '+1 234 567 8901',
   },
   driver: {
-    email: 'driver@kbd-havya.com',
+    email: 'driver@urbanmove.com',
     password: 'Driver1234',
     name: 'Demo Driver',
     role: 'driver',
-    company: 'KBD-Havya Shuttle',
+    company: 'UrbanMove Shuttle',
     phone: '+1 234 567 8902',
   },
   admin: {
-    email: 'admin@kbd-havya.com',
+    email: 'admin@urbanmove.com',
     password: 'Admin1234',
     name: 'Admin User',
     role: 'admin',
-    company: 'KBD-Havya HQ',
+    company: 'UrbanMove HQ',
     phone: '+1 234 567 8903',
   },
 }

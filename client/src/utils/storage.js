@@ -30,11 +30,11 @@ export const removeItem = (key) => {
 
 export const clearAll = () => {
   try {
-    localStorage.removeItem('kbd-havya-user')
-    localStorage.removeItem('kbd-havya-token')
-    localStorage.removeItem('kbd-havya-theme')
-    localStorage.removeItem('kbd-havya-booking-step')
-    localStorage.removeItem('kbd-havya-filters')
+    localStorage.removeItem('urbanmove-user')
+    localStorage.removeItem('urbanmove-token')
+    localStorage.removeItem('urbanmove-theme')
+    localStorage.removeItem('urbanmove-booking-step')
+    localStorage.removeItem('urbanmove-filters')
     sessionStorage.clear()
     return true
   } catch (error) {

@@ -1,8 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { getItem, setItem, removeItem } from '../utils/storage'
 
-const storedUser = getItem('kbd-havya-user')
-const storedToken = getItem('kbd-havya-token')
+const storedUser = getItem('urbanmove-user')
+const storedToken = getItem('urbanmove-token')
 
 const initialState = {
   user: storedUser || null,
@@ -24,13 +24,13 @@ const authSlice = createSlice({
       state.isAuthenticated = true
       state.role = user.role
       state.error = null
-      setItem('kbd-havya-user', user)
-      setItem('kbd-havya-token', token)
+      setItem('urbanmove-user', user)
+      setItem('urbanmove-token', token)
     },
     setUser: (state, action) => {
       state.user = action.payload
       state.role = action.payload.role
-      setItem('kbd-havya-user', action.payload)
+      setItem('urbanmove-user', action.payload)
     },
     setLoading: (state, action) => {
       state.loading = action.payload
@@ -46,8 +46,8 @@ const authSlice = createSlice({
       state.role = null
       state.loading = false
       state.error = null
-      removeItem('kbd-havya-user')
-      removeItem('kbd-havya-token')
+      removeItem('urbanmove-user')
+      removeItem('urbanmove-token')
     },
     clearError: (state) => {
       state.error = null

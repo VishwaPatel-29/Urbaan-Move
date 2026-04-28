@@ -90,7 +90,7 @@ const HeroSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <Typography
+                    <Typography
             variant="h1"
             sx={{
               fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4rem' },

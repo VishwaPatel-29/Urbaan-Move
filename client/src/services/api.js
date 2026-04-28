@@ -3,7 +3,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
 // API headers configuration
 const getHeaders = () => {
-  const token = localStorage.getItem('kbd-havya-token')
+  const token = localStorage.getItem('urbanmove-token')
   return {
     'Content-Type': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` }),
@@ -47,9 +47,9 @@ const apiRequest = async (endpoint, options = {}) => {
 const getMockResponse = (endpoint, options) => {
   // Generate user name based on login credentials
   const generateUserName = (email, role) => {
-    if (email === 'demo@kbd-havya.com') return 'John Employee'
-    if (email === 'driver@kbd-havya.com') return 'Mike Driver'
-    if (email === 'admin@kbd-havya.com') return 'Sarah Admin'
+    if (email === 'demo@urbanmove.com') return 'John Employee'
+    if (email === 'driver@urbanmove.com') return 'Mike Driver'
+    if (email === 'admin@urbanmove.com') return 'Sarah Admin'
     // Extract name from email or use role-based name
     const emailPrefix = email.split('@')[0]
     return emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1).replace('.', ' ')
@@ -60,7 +60,7 @@ const getMockResponse = (endpoint, options) => {
       try {
         // Parse the request body to get the actual credentials
         const requestBody = options.body ? JSON.parse(options.body) : {}
-        const email = requestBody.email || 'demo@kbd-havya.com'
+        const email = requestBody.email || 'demo@urbanmove.com'
         const name = requestBody.name || 'Demo User'
         const role = requestBody.role || 'employee'
         
@@ -93,7 +93,7 @@ const getMockResponse = (endpoint, options) => {
         user: {
           id: '2',
           name: 'New User',
-          email: 'user@kbd-havya.com',
+          email: 'user@urbanmove.com',
           role: 'user',
           phone: '+1234567890',
           company: 'InnovateTech',
@@ -108,7 +108,7 @@ const getMockResponse = (endpoint, options) => {
         user: {
           id: '3',
           name: 'Google User',
-          email: 'google@kbd-havya.com',
+          email: 'google@urbanmove.com',
           role: 'user',
           phone: '+1234567890',
           company: 'Google Corp',
@@ -123,7 +123,7 @@ const getMockResponse = (endpoint, options) => {
         user: {
           id: '4',
           name: 'Google User',
-          email: 'google@kbd-havya.com',
+          email: 'google@urbanmove.com',
           role: 'user',
           phone: '+1234567890',
           company: 'Google Corp',

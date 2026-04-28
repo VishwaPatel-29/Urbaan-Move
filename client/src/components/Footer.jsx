@@ -1,230 +1,268 @@
 import React from 'react'
-import { Box, Typography, Grid, IconButton, Link } from '@mui/material'
-import {
-  DirectionsBus,
-  Email,
-  Phone,
-  LocationOn,
-  Facebook,
-  Twitter,
-  LinkedIn,
-  Instagram,
-} from '@mui/icons-material'
-import { Link as RouterLink } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { Box, Typography, Container, Grid, IconButton, Divider } from '@mui/material'
 import { useSelector } from 'react-redux'
 import { selectTheme } from '../features/uiSlice'
+import { 
+  Facebook, 
+  Twitter, 
+  LinkedIn, 
+  Instagram, 
+  Email, 
+  Phone, 
+  LocationOn,
+  DirectionsCar,
+  Payment,
+  Security,
+  Help,
+  People,
+  AccessTime,
+  TrendingUp
+} from '@mui/icons-material'
 
 const Footer = () => {
   const theme = useSelector(selectTheme)
-  const currentYear = new Date().getFullYear()
 
-  const quickLinks = [
-    { label: 'Home', path: '/' },
-    { label: 'Features', path: '/#features' },
-    { label: 'How It Works', path: '/#how-it-works' },
-    { label: 'Login', path: '/login' },
-    { label: 'Sign Up', path: '/register' },
-  ]
+  const linkStyle = {
+    color: theme === 'dark' ? '#888' : '#666',
+    textDecoration: 'none',
+    fontSize: '0.875rem',
+  }
 
-  const supportLinks = [
-    { label: 'Help Center', path: '/help' },
-    { label: 'Contact Us', path: '/contact' },
-    { label: 'FAQs', path: '/faqs' },
-    { label: 'Privacy Policy', path: '/privacy' },
-    { label: 'Terms of Service', path: '/terms' },
-  ]
-
-  const socialLinks = [
-    { icon: Facebook, href: 'https://facebook.com/kbdhavya' },
-    { icon: Twitter, href: 'https://twitter.com/kbdhavya' },
-    { icon: LinkedIn, href: 'https://linkedin.com/company/kbdhavya' },
-    { icon: Instagram, href: 'https://instagram.com/kbdhavya' },
-  ]
+  const linkHoverStyle = {
+    color: '#008080',
+    textDecoration: 'none',
+  }
 
   return (
     <Box
       component="footer"
       sx={{
-        background: theme === 'dark' ? '#0a0a0a' : '#fff',
-        borderTop: `1px solid ${theme === 'dark' ? '#333' : '#e0e0e0'}`,
-        py: { xs: 6, md: 8 },
-        px: { xs: 2, md: 4 },
+        py: 4,
+        background: theme === 'dark' ? '#0A0A0A' : '#F8F9FA',
+        borderTop: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
       }}
     >
-      <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+      <Container maxWidth="lg">
+        {/* Main Footer Grid - 5 columns, 2 rows */}
         <Grid container spacing={4}>
-          <Grid item xs={12} md={4}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-              <DirectionsBus sx={{ color: '#00B4B4', fontSize: 32 }} />
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: 700,
-                  background: 'linear-gradient(135deg, #00B4B4 0%, #FFB6C1 100%)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >
-                KBD-Havya
+          {/* Row 1 - Company Info & Navigation */}
+          <Grid item xs={12} sm={6} md={2.4}>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="h6" sx={{ color: theme === 'dark' ? '#008080' : '#006666', mb: 1, fontWeight: 700 }}>
+                UrbanMove
               </Typography>
-            </Box>
-            <Typography
-              variant="body2"
-              sx={{
-                mb: 3,
-                color: theme === 'dark' ? '#a0a0a0' : '#666',
-              }}
-            >
-              Smart Commutes. Real-Time Routes. The future of corporate shuttle
-              services is here. Join thousands of employees who trust KBD-Havya
-              for their daily commute.
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              {socialLinks.map((social) => (
+              <Typography variant="body2" sx={{ color: theme === 'dark' ? '#888' : '#666', mb: 2 }}>
+                Smart Commutes. Real-Time Routes.
+              </Typography>
+              
+              {/* Social Media Icons */}
+              <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
                 <IconButton
-                  key={social.href}
-                  component="a"
-                  href={social.href}
+                  size="small"
+                  sx={{ 
+                    color: theme === 'dark' ? '#888' : '#666',
+                    '&:hover': { color: '#008080' }
+                  }}
+                  href="https://facebook.com"
                   target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{
-                    color: '#00B4B4',
-                    border: '1px solid #00B4B4',
-                    '&:hover': {
-                      background: '#00B4B4',
-                      color: '#fff',
-                    },
-                  }}
                 >
-                  <social.icon />
+                  <Facebook fontSize="small" />
                 </IconButton>
-              ))}
+                <IconButton
+                  size="small"
+                  sx={{ 
+                    color: theme === 'dark' ? '#888' : '#666',
+                    '&:hover': { color: '#008080' }
+                  }}
+                  href="https://twitter.com"
+                  target="_blank"
+                >
+                  <Twitter fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  sx={{ 
+                    color: theme === 'dark' ? '#888' : '#666',
+                    '&:hover': { color: '#008080' }
+                  }}
+                  href="https://linkedin.com"
+                  target="_blank"
+                >
+                  <LinkedIn fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  sx={{ 
+                    color: theme === 'dark' ? '#888' : '#666',
+                    '&:hover': { color: '#008080' }
+                  }}
+                  href="https://instagram.com"
+                  target="_blank"
+                >
+                  <Instagram fontSize="small" />
+                </IconButton>
+              </Box>
+
+              {/* Contact Info */}
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Email sx={{ fontSize: 16, color: '#008080' }} />
+                  <Typography variant="caption" sx={{ color: theme === 'dark' ? '#888' : '#666' }}>
+                    support@urbanmove.com
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Phone sx={{ fontSize: 16, color: '#008080' }} />
+                  <Typography variant="caption" sx={{ color: theme === 'dark' ? '#888' : '#666' }}>
+                    +1 (555) 123-4567
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <LocationOn sx={{ fontSize: 16, color: '#008080' }} />
+                  <Typography variant="caption" sx={{ color: theme === 'dark' ? '#888' : '#666' }}>
+                    San Francisco, CA
+                  </Typography>
+                </Box>
+              </Box>
             </Box>
           </Grid>
 
-          <Grid item xs={6} md={2}>
-            <Typography
-              variant="h6"
-              sx={{
-                mb: 2,
-                fontWeight: 600,
-                color: theme === 'dark' ? '#fff' : '#1a1a1a',
-              }}
-            >
-              Quick Links
-            </Typography>
-            {quickLinks.map((link) => (
-              <Box key={link.label} sx={{ mb: 1 }}>
-                <Link
-                  component={RouterLink}
-                  to={link.path}
-                  sx={{
-                    color: theme === 'dark' ? '#a0a0a0' : '#666',
-                    textDecoration: 'none',
-                    '&:hover': { color: '#00B4B4' },
-                  }}
-                >
-                  {link.label}
-                </Link>
-              </Box>
-            ))}
-          </Grid>
-
-          <Grid item xs={6} md={2}>
-            <Typography
-              variant="h6"
-              sx={{
-                mb: 2,
-                fontWeight: 600,
-                color: theme === 'dark' ? '#fff' : '#1a1a1a',
-              }}
-            >
-              Support
-            </Typography>
-            {supportLinks.map((link) => (
-              <Box key={link.label} sx={{ mb: 1 }}>
-                <Link
-                  component={RouterLink}
-                  to={link.path}
-                  sx={{
-                    color: theme === 'dark' ? '#a0a0a0' : '#666',
-                    textDecoration: 'none',
-                    '&:hover': { color: '#00B4B4' },
-                  }}
-                >
-                  {link.label}
-                </Link>
-              </Box>
-            ))}
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <Typography
-              variant="h6"
-              sx={{
-                mb: 2,
-                fontWeight: 600,
-                color: theme === 'dark' ? '#fff' : '#1a1a1a',
-              }}
-            >
-              Contact Us
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-              <LocationOn sx={{ color: '#00B4B4', fontSize: 20 }} />
-              <Typography
-                variant="body2"
-                sx={{ color: theme === 'dark' ? '#a0a0a0' : '#666' }}
-              >
-                123 Business Park Drive, Tech City, TC 12345
+          <Grid item xs={12} sm={6} md={2.4}>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" sx={{ color: theme === 'dark' ? '#fff' : '#333', mb: 2, fontWeight: 600 }}>
+                Quick Links
               </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Link to="/" style={linkStyle}>
+                  Home
+                </Link>
+                <Link to="/about" style={linkStyle}>
+                  About Us
+                </Link>
+                <Link to="/dashboard" style={linkStyle}>
+                  Dashboard
+                </Link>
+                <Link to="/booking" style={linkStyle}>
+                  Book Ride
+                </Link>
+                <Link to="/rides" style={linkStyle}>
+                  My Rides
+                </Link>
+              </Box>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-              <Email sx={{ color: '#00B4B4', fontSize: 20 }} />
-              <Link
-                href="mailto:support@kbdhavya.com"
-                sx={{
-                  color: theme === 'dark' ? '#a0a0a0' : '#666',
-                  textDecoration: 'none',
-                  '&:hover': { color: '#00B4B4' },
-                }}
-              >
-                support@kbdhavya.com
-              </Link>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={2.4}>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" sx={{ color: theme === 'dark' ? '#fff' : '#333', mb: 2, fontWeight: 600 }}>
+                Services
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Link to="/find-ride" style={linkStyle}>
+                  Find Ride
+                </Link>
+                <Link to="/schedule-ride" style={linkStyle}>
+                  Schedule Ride
+                </Link>
+                <Link to="/ride-tracking" style={linkStyle}>
+                  Live Tracking
+                </Link>
+                <Link to="/payment-methods" style={linkStyle}>
+                  Payment
+                </Link>
+                <Link to="/wallet" style={linkStyle}>
+                  Wallet
+                </Link>
+              </Box>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Phone sx={{ color: '#00B4B4', fontSize: 20 }} />
-              <Link
-                href="tel:+1234567890"
-                sx={{
-                  color: theme === 'dark' ? '#a0a0a0' : '#666',
-                  textDecoration: 'none',
-                  '&:hover': { color: '#00B4B4' },
-                }}
-              >
-                +1 (234) 567-890
-              </Link>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={2.4}>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" sx={{ color: theme === 'dark' ? '#fff' : '#333', mb: 2, fontWeight: 600 }}>
+                Support & Legal
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Link to="/help" style={linkStyle}>
+                  Help Center
+                </Link>
+                <Link to="/faq" style={linkStyle}>
+                  FAQ
+                </Link>
+                <Link to="/contact" style={linkStyle}>
+                  Contact Us
+                </Link>
+                <Link to="/terms" style={linkStyle}>
+                  Terms of Service
+                </Link>
+                <Link to="/privacy" style={linkStyle}>
+                  Privacy Policy
+                </Link>
+              </Box>
+            </Box>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={2.4}>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" sx={{ color: theme === 'dark' ? '#fff' : '#333', mb: 2, fontWeight: 600 }}>
+                Features
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Link to="/profile" style={linkStyle}>
+                  Profile
+                </Link>
+                <Link to="/settings" style={linkStyle}>
+                  Settings
+                </Link>
+                <Link to="/notifications" style={linkStyle}>
+                  Notifications
+                </Link>
+                <Link to="/messages" style={linkStyle}>
+                  Messages
+                </Link>
+                <Link to="/map-view" style={linkStyle}>
+                  Map View
+                </Link>
+              </Box>
+            </Box>
+          </Grid>
+
+          {/* Row 2 - Bottom Footer */}
+          <Grid item xs={12}>
+            <Divider sx={{ mb: 3, borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }} />
+            
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: 2 
+            }}>
+              <Box>
+                <Typography variant="body2" sx={{ color: theme === 'dark' ? '#888' : '#666' }}>
+                  © 2024 UrbanMove. All rights reserved.
+                </Typography>
+                <Typography variant="caption" sx={{ color: theme === 'dark' ? '#666' : '#999', display: 'block' }}>
+                  Smart Commutes. Real-Time Routes. Making corporate travel efficient.
+                </Typography>
+              </Box>
+              
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                <Link to="/privacy" style={linkStyle}>
+                  Cookie Policy
+                </Link>
+                <Link to="/billing" style={linkStyle}>
+                  Billing
+                </Link>
+                <Link to="/analytics" style={linkStyle}>
+                  Analytics
+                </Link>
+              </Box>
             </Box>
           </Grid>
         </Grid>
-
-        <Box
-          sx={{
-            mt: 4,
-            pt: 4,
-            borderTop: `1px solid ${theme === 'dark' ? '#333' : '#e0e0e0'}`,
-            textAlign: 'center',
-          }}
-        >
-          <Typography
-            variant="body2"
-            sx={{ color: theme === 'dark' ? '#a0a0a0' : '#666' }}
-          >
-            &copy; {currentYear} KBD-Havya. All rights reserved. | Smart Commutes.
-            Real-Time Routes.
-          </Typography>
-        </Box>
-      </Box>
+      </Container>
     </Box>
   )
 }

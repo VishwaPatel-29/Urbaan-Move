@@ -11,7 +11,7 @@ const testimonials = [
     company: 'TechCorp Inc.',
     avatar: null,
     rating: 5,
-    text: 'KBD-Havya has completely transformed my commute. I used to waste 45 minutes waiting for the company shuttle. Now I request a ride and it arrives in minutes. Game changer!',
+    text: 'UrbanMove has completely transformed my commute. I used to waste 45 minutes waiting for the company shuttle. Now I request a ride and it arrives in minutes. Game changer!',
   },
   {
     name: 'Michael Chen',
@@ -27,7 +27,7 @@ const testimonials = [
     company: 'BusinessPark Solutions',
     avatar: null,
     rating: 5,
-    text: 'As an HR manager, I see the impact on employee satisfaction daily. KBD-Havya has reduced our shuttle-related complaints by 90%. The analytics dashboard helps us optimize routes.',
+    text: 'As an HR manager, I see the impact on employee satisfaction daily. UrbanMove has reduced our shuttle-related complaints by 90%. The analytics dashboard helps us optimize routes.',
   },
   {
     name: 'David Kim',

@@ -72,7 +72,7 @@ const Dashboard = () => {
     setNotifications([
       {
         id: 1,
-        title: 'Welcome to KBD-Havya!',
+        title: 'Welcome to UrbanMove!',
         message: 'Your account has been successfully created.',
         icon: DirectionsBus,
         time: '2 min ago'
@@ -161,7 +161,7 @@ const Dashboard = () => {
             marginBottom: '20px',
             letterSpacing: '-1px'
           }}>
-            KBD-Havya Dashboard
+            UrbanMove Dashboard
           </h1>
           <p style={{ fontSize: '20px', color: '#a0a0a0', marginBottom: '10px' }}>
             Your Smart Commute Management System
@@ -186,7 +186,7 @@ const Dashboard = () => {
             fontWeight: '700',
             marginBottom: '15px'
           }}>
-            Welcome back, {user?.name || 'User'}!
+            Welcome back!
           </h2>
           <p style={{ color: '#a0a0a0', fontSize: '18px', marginBottom: '10px' }}>
             Ready for your next smart commute?

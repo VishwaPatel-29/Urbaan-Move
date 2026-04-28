@@ -7,7 +7,7 @@ const listeners = new Map()
 export const initializeSocket = () => {
   if (socket) return socket
 
-  const token = getItem('kbd-havya-token')
+  const token = getItem('urbanmove-token')
   if (!token) {
     console.warn('No auth token found, skipping socket initialization')
     return null

@@ -117,8 +117,8 @@ const Profile = () => {
   return (
     <>
       <Helmet>
-        <title>Profile | KBD-Havya</title>
-        <meta name="description" content="Manage your KBD-Havya profile and preferences." />
+        <title>Profile | UrbanMove</title>
+        <meta name="description" content="Manage your UrbanMove profile and preferences." />
       </Helmet>
 
       <Box sx={{ minHeight: '100vh', background: theme === 'dark' ? '#000' : '#f5f5f5' }}>

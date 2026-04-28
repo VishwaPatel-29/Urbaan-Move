@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { getItem, setItem } from '../utils/storage'
 
-const storedTheme = getItem('kbd-havya-theme') || 'dark'
+const storedTheme = getItem('urbanmove-theme') || 'dark'
 
 const initialState = {
   theme: storedTheme,
@@ -19,14 +19,14 @@ const uiSlice = createSlice({
   reducers: {
     setTheme: (state, action) => {
       state.theme = action.payload
-      setItem('kbd-havya-theme', action.payload)
+      setItem('urbanmove-theme', action.payload)
       document.documentElement.classList.toggle('dark', action.payload === 'dark')
       document.body.classList.toggle('light', action.payload === 'light')
     },
     toggleTheme: (state) => {
       const newTheme = state.theme === 'dark' ? 'light' : 'dark'
       state.theme = newTheme
-      setItem('kbd-havya-theme', newTheme)
+      setItem('urbanmove-theme', newTheme)
       document.documentElement.classList.toggle('dark', newTheme === 'dark')
       document.body.classList.toggle('light', newTheme === 'light')
     },

@@ -8,7 +8,7 @@ const HelixAIButton = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState([
     { 
-      text: "Hello! I'm Helix AI, your KBD-Havya assistant. How can I help you today?", 
+      text: "Hello! I'm Helix AI, your UrbanMove assistant. How can I help you today?", 
       isAI: true 
     }
   ])
@@ -22,7 +22,7 @@ const HelixAIButton = () => {
       // Simulate AI response
       setTimeout(() => {
         const aiResponse = { 
-          text: "I'm here to help you with KBD-Havya! I can tell you about our smart commuting platform, real-time routing, corporate shuttles, and much more. What would you like to know?", 
+          text: "I'm here to help you with UrbanMove! I can tell you about our smart commuting platform, real-time routing, corporate shuttles, and much more. What would you like to know?", 
           isAI: true 
         }
         setMessages(prev => [...prev, aiResponse])
@@ -86,7 +86,7 @@ const HelixAIButton = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <SmartToy sx={{ color: '#fff', fontSize: 24 }} />
                   <Typography variant="h6" sx={{ color: '#fff', fontSize: '1rem' }}>
-                    KBD-Havya's Helix AI
+                    UrbanMove's Helix AI
                   </Typography>
                 </Box>
                 <IconButton size="small" onClick={toggleChat}>
@@ -141,7 +141,7 @@ const HelixAIButton = () => {
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Ask me about KBD-Havya..."
+                  placeholder="Ask me about UrbanMove..."
                   sx={{
                     flex: 1,
                     px: 2,

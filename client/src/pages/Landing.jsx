@@ -20,12 +20,12 @@ const Landing = () => {
   return (
     <>
       <Helmet>
-        <title>KBD-Havya | Smart Commutes. Real-Time Routes.</title>
+        <title>UrbanMove | Smart Commutes. Real-Time Routes.</title>
         <meta
           name="description"
           content="On-demand corporate shuttle and van-pooling platform for employees commuting to business parks and IT campuses. Book rides, track live, and save time."
         />
-        <meta property="og:title" content="KBD-Havya | Smart Commutes. Real-Time Routes." />
+        <meta property="og:title" content="UrbanMove | Smart Commutes. Real-Time Routes." />
         <meta
           property="og:description"
           content="On-demand corporate shuttle and van-pooling platform. Dynamic routing based on real-time passenger requests."

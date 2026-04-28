@@ -25,7 +25,7 @@ import {
   CircularProgress,
 } from '@mui/material'
 import {
-  DirectionsBus,
+  DirectionsCar,
   Cancel,
   RateReview,
   AccessTime,
@@ -130,8 +130,8 @@ const Rides = () => {
   return (
     <>
       <Helmet>
-        <title>My Rides | KBD-Havya</title>
-        <meta name="description" content="View your ride history with KBD-Havya." />
+        <title>My Rides | UrbanMove</title>
+        <meta name="description" content="View your ride history with UrbanMove." />
       </Helmet>
 
       <Box sx={{ minHeight: '100vh', background: theme === 'dark' ? '#000' : '#f5f5f5' }}>
@@ -155,7 +155,7 @@ const Rides = () => {
                 component={Link}
                 to="/book"
                 variant="contained"
-                startIcon={<DirectionsBus />}
+                startIcon={<DirectionsCar />}
                 sx={{
                   background: 'linear-gradient(135deg, #00B4B4 0%, #008080 100%)',
                 }}
@@ -185,7 +185,7 @@ const Rides = () => {
                   </Box>
                 ) : filteredRides.length === 0 ? (
                   <Box sx={{ textAlign: 'center', py: 8 }}>
-                    <DirectionsBus sx={{ fontSize: 64, color: '#333', mb: 2 }} />
+                    <DirectionsCar sx={{ fontSize: 64, color: '#333', mb: 2 }} />
                     <Typography variant="h6" sx={{ color: '#666' }}>
                       No rides found
                     </Typography>
@@ -307,7 +307,7 @@ const Rides = () => {
                     </Box>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <DirectionsBus sx={{ color: '#00B4B4' }} />
+                    <DirectionsCar sx={{ color: '#00B4B4' }} />
                     <Box>
                       <Typography variant="caption" sx={{ color: '#666' }}>Vehicle</Typography>
                       <Typography variant="body1">{selectedRide.vehicle || 'Not assigned'}</Typography>

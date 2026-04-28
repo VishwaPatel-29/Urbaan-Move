@@ -84,7 +84,7 @@ const FeaturesSection = () => {
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              KBD-Havya
+              UrbanMove
             </Box>
           </Typography>
           <Typography
