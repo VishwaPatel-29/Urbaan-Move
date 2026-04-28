@@ -206,13 +206,29 @@ const Register = () => {
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
                 <Box
                   component="img"
-                  src="/logo.svg"
+                  src={import.meta.env.BASE_URL + "logo.svg"}
                   alt="UrbanMove"
                   sx={{
                     height: { xs: '45px', sm: '50px', md: '55px' },
                     width: 'auto',
                   }}
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }}
                 />
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 700,
+                    color: '#00B4B4',
+                    display: 'none',
+                    textAlign: 'center',
+                    fontSize: { xs: '1.2rem', sm: '1.5rem' }
+                  }}
+                >
+                  UrbanMove
+                </Typography>
               </Box>
 
               <Typography

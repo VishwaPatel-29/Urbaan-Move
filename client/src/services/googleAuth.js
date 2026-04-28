@@ -1,6 +1,6 @@
 class GoogleAuthService {
   constructor() {
-    this.clientId = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'
+    this.clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'
     this.isInitialized = false
   }
 
