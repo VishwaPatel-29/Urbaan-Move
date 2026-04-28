@@ -177,13 +177,28 @@ const Navbar = () => {
           >
             <Box
               component="img"
-              src="/logo.svg"
+              src={import.meta.env.BASE_URL + "logo.svg"}
               alt="UrbanMove"
               sx={{
                 height: 60,
                 width: 'auto',
               }}
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'block';
+              }}
             />
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 700,
+                color: '#00B4B4',
+                display: 'none',
+                fontSize: { xs: '1.2rem', sm: '1.5rem' }
+              }}
+            >
+              UrbanMove
+            </Typography>
           </Box>
 
           {/* Right Side Navigation Items */}
