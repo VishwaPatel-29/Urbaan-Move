@@ -52,6 +52,9 @@ import {
   AccessTime
 } from '@mui/icons-material'
 
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
+
 const NotificationsPage = () => {
   const [notifications, setNotifications] = useState([
     {
@@ -199,293 +202,299 @@ const NotificationsPage = () => {
   const unreadCount = notifications.filter(n => !n.read).length
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom fontWeight="bold">
-        Notifications
-      </Typography>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Navbar />
+      <Box component="main" sx={{ flexGrow: 1, pt: '80px', pb: 4 }}>
+        <Container maxWidth="md">
+          <Typography variant="h4" gutterBottom fontWeight="bold">
+            Notifications
+          </Typography>
 
-      {/* Header with Stats */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Box display="flex" alignItems="center" gap={3}>
-              <Badge badgeContent={unreadCount} color="error">
-                <NotificationsIcon sx={{ fontSize: 32 }} />
-              </Badge>
-              <Box>
-                <Typography variant="h6">
-                  {unreadCount} unread notifications
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {notifications.length} total notifications
-                </Typography>
-              </Box>
-            </Box>
-            <Box display="flex" gap={2}>
-              <Button
-                variant="outlined"
-                startIcon={<MarkEmailRead />}
-                onClick={handleMarkAllAsRead}
-                disabled={unreadCount === 0}
-              >
-                Mark All Read
-              </Button>
-              <Button
-                variant="outlined"
-                startIcon={<Delete />}
-                onClick={handleClearAll}
-                disabled={notifications.length === 0}
-              >
-                Clear All
-              </Button>
-              <IconButton onClick={() => setShowSettingsDialog(true)}>
-                <Settings />
-              </IconButton>
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
-
-      {/* Filters and Search */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box display="flex" gap={2} alignItems="center" flexWrap="wrap">
-            <TextField
-              placeholder="Search notifications..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: <Search sx={{ mr: 1, color: 'action.active' }} />
-              }}
-              size="small"
-              sx={{ minWidth: 250 }}
-            />
-            <FormControl size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Filter</InputLabel>
-              <Select
-                value={filter}
-                label="Filter"
-                onChange={(e) => setFilter(e.target.value)}
-              >
-                {filters.map(f => (
-                  <MenuItem key={f.value} value={f.value}>
-                    {f.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-        </CardContent>
-      </Card>
-
-      {/* Notifications List */}
-      <Card>
-        <CardContent>
-          {filteredNotifications.length === 0 ? (
-            <Box textAlign="center" py={4}>
-              <NotificationsIcon sx={{ fontSize: 64, color: 'action.disabled', mb: 2 }} />
-              <Typography variant="h6" color="text.secondary" gutterBottom>
-                No notifications found
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {searchTerm || filter !== 'all' 
-                  ? 'Try adjusting your search or filters' 
-                  : 'You\'re all caught up! No new notifications.'}
-              </Typography>
-            </Box>
-          ) : (
-            <List>
-              {filteredNotifications.map((notification) => (
-                <ListItem key={notification.id} divider>
-                  <ListItemIcon>
-                    <Avatar sx={{ bgcolor: !notification.read ? 'primary.main' : 'action.disabled' }}>
-                      {notification.icon}
-                    </Avatar>
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <Typography 
-                          variant="subtitle1" 
-                          sx={{ fontWeight: !notification.read ? 'bold' : 'normal' }}
-                        >
-                          {notification.title}
-                        </Typography>
-                        <Chip
-                          label={notification.priority}
-                          color={getPriorityColor(notification.priority)}
-                          size="small"
-                        />
-                      </Box>
-                    }
-                    secondary={
-                      <Box>
-                        <Typography 
-                          variant="body2" 
-                          color="text.secondary"
-                          sx={{ fontWeight: !notification.read ? 'medium' : 'normal' }}
-                        >
-                          {notification.message}
-                        </Typography>
-                        <Box display="flex" alignItems="center" gap={2} mt={1}>
-                          <Typography variant="caption" color="text.secondary">
-                            <AccessTime sx={{ fontSize: 14, mr: 0.5 }} />
-                            {notification.timestamp}
-                          </Typography>
-                          <Button
-                            variant="text"
-                            size="small"
-                            onClick={() => handleNotificationAction(notification)}
-                          >
-                            {notification.action}
-                          </Button>
-                        </Box>
-                      </Box>
-                    }
-                  />
-                  <Box display="flex" alignItems="center" gap={1}>
-                    {!notification.read && (
-                      <IconButton
-                        size="small"
-                        onClick={() => handleMarkAsRead(notification.id)}
-                        color="primary"
-                      >
-                        <MarkEmailRead />
-                      </IconButton>
-                    )}
-                    <IconButton
-                      size="small"
-                      onClick={() => handleDeleteNotification(notification.id)}
-                      color="error"
-                    >
-                      <Delete />
-                    </IconButton>
+          {/* Header with Stats */}
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box display="flex" alignItems="center" gap={3}>
+                  <Badge badgeContent={unreadCount} color="error">
+                    <NotificationsIcon sx={{ fontSize: 32 }} />
+                  </Badge>
+                  <Box>
+                    <Typography variant="h6">
+                      {unreadCount} unread notifications
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {notifications.length} total notifications
+                    </Typography>
                   </Box>
+                </Box>
+                <Box display="flex" gap={2}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<MarkEmailRead />}
+                    onClick={handleMarkAllAsRead}
+                    disabled={unreadCount === 0}
+                  >
+                    Mark All Read
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    startIcon={<Delete />}
+                    onClick={handleClearAll}
+                    disabled={notifications.length === 0}
+                  >
+                    Clear All
+                  </Button>
+                  <IconButton onClick={() => setShowSettingsDialog(true)}>
+                    <Settings />
+                  </IconButton>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+
+          {/* Filters and Search */}
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Box display="flex" gap={2} alignItems="center" flexWrap="wrap">
+                <TextField
+                  placeholder="Search notifications..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  InputProps={{
+                    startAdornment: <Search sx={{ mr: 1, color: 'action.active' }} />
+                  }}
+                  size="small"
+                  sx={{ minWidth: 250 }}
+                />
+                <FormControl size="small" sx={{ minWidth: 150 }}>
+                  <InputLabel>Filter</InputLabel>
+                  <Select
+                    value={filter}
+                    label="Filter"
+                    onChange={(e) => setFilter(e.target.value)}
+                  >
+                    {filters.map(f => (
+                      <MenuItem key={f.value} value={f.value}>
+                        {f.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            </CardContent>
+          </Card>
+
+          {/* Notifications List */}
+          <Card>
+            <CardContent>
+              {filteredNotifications.length === 0 ? (
+                <Box textAlign="center" py={4}>
+                  <NotificationsIcon sx={{ fontSize: 64, color: 'action.disabled', mb: 2 }} />
+                  <Typography variant="h6" color="text.secondary" gutterBottom>
+                    No notifications found
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {searchTerm || filter !== 'all' 
+                      ? 'Try adjusting your search or filters' 
+                      : 'You\'re all caught up! No new notifications.'}
+                  </Typography>
+                </Box>
+              ) : (
+                <List>
+                  {filteredNotifications.map((notification) => (
+                    <ListItem key={notification.id} divider>
+                      <ListItemIcon>
+                        <Avatar sx={{ bgcolor: !notification.read ? 'primary.main' : 'action.disabled' }}>
+                          {notification.icon}
+                        </Avatar>
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <Box display="flex" alignItems="center" gap={1}>
+                            <Typography 
+                              variant="subtitle1" 
+                              sx={{ fontWeight: !notification.read ? 'bold' : 'normal' }}
+                            >
+                              {notification.title}
+                            </Typography>
+                            <Chip
+                              label={notification.priority}
+                              color={getPriorityColor(notification.priority)}
+                              size="small"
+                            />
+                          </Box>
+                        }
+                        secondary={
+                          <Box>
+                            <Typography 
+                              variant="body2" 
+                              color="text.secondary"
+                              sx={{ fontWeight: !notification.read ? 'medium' : 'normal' }}
+                            >
+                              {notification.message}
+                            </Typography>
+                            <Box display="flex" alignItems="center" gap={2} mt={1}>
+                              <Typography variant="caption" color="text.secondary">
+                                <AccessTime sx={{ fontSize: 14, mr: 0.5 }} />
+                                {notification.timestamp}
+                              </Typography>
+                              <Button
+                                variant="text"
+                                size="small"
+                                onClick={() => handleNotificationAction(notification)}
+                              >
+                                {notification.action}
+                              </Button>
+                            </Box>
+                          </Box>
+                        }
+                      />
+                      <Box display="flex" alignItems="center" gap={1}>
+                        {!notification.read && (
+                          <IconButton
+                            size="small"
+                            onClick={() => handleMarkAsRead(notification.id)}
+                            color="primary"
+                          >
+                            <MarkEmailRead />
+                          </IconButton>
+                        )}
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDeleteNotification(notification.id)}
+                          color="error"
+                        >
+                          <Delete />
+                        </IconButton>
+                      </Box>
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Notification Settings Dialog */}
+          <Dialog open={showSettingsDialog} onClose={() => setShowSettingsDialog(false)} maxWidth="sm" fullWidth>
+            <DialogTitle>Notification Settings</DialogTitle>
+            <DialogContent>
+              <Typography variant="h6" gutterBottom>Notification Channels</Typography>
+              <List dense>
+                <ListItem>
+                  <ListItemText primary="Push Notifications" secondary="Receive notifications on your device" />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={notificationSettings.pushNotifications}
+                        onChange={handleSettingChange('pushNotifications')}
+                      />
+                    }
+                    label=""
+                  />
                 </ListItem>
-              ))}
-            </List>
-          )}
-        </CardContent>
-      </Card>
+                <ListItem>
+                  <ListItemText primary="Email Notifications" secondary="Receive updates via email" />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={notificationSettings.emailNotifications}
+                        onChange={handleSettingChange('emailNotifications')}
+                      />
+                    }
+                    label=""
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary="SMS Notifications" secondary="Get important updates via text" />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={notificationSettings.smsNotifications}
+                        onChange={handleSettingChange('smsNotifications')}
+                      />
+                    }
+                    label=""
+                  />
+                </ListItem>
+              </List>
 
-      {/* Notification Settings Dialog */}
-      <Dialog open={showSettingsDialog} onClose={() => setShowSettingsDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Notification Settings</DialogTitle>
-        <DialogContent>
-          <Typography variant="h6" gutterBottom>Notification Channels</Typography>
-          <List dense>
-            <ListItem>
-              <ListItemText primary="Push Notifications" secondary="Receive notifications on your device" />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={notificationSettings.pushNotifications}
-                    onChange={handleSettingChange('pushNotifications')}
-                  />
-                }
-                label=""
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="Email Notifications" secondary="Receive updates via email" />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={notificationSettings.emailNotifications}
-                    onChange={handleSettingChange('emailNotifications')}
-                  />
-                }
-                label=""
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="SMS Notifications" secondary="Get important updates via text" />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={notificationSettings.smsNotifications}
-                    onChange={handleSettingChange('smsNotifications')}
-                  />
-                }
-                label=""
-              />
-            </ListItem>
-          </List>
+              <Divider sx={{ my: 2 }} />
 
-          <Divider sx={{ my: 2 }} />
-
-          <Typography variant="h6" gutterBottom>Notification Types</Typography>
-          <List dense>
-            <ListItem>
-              <ListItemText primary="Ride Updates" secondary="Pickup, dropoff, and ride status" />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={notificationSettings.rideUpdates}
-                    onChange={handleSettingChange('rideUpdates')}
+              <Typography variant="h6" gutterBottom>Notification Types</Typography>
+              <List dense>
+                <ListItem>
+                  <ListItemText primary="Ride Updates" secondary="Pickup, dropoff, and ride status" />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={notificationSettings.rideUpdates}
+                        onChange={handleSettingChange('rideUpdates')}
+                      />
+                    }
+                    label=""
                   />
-                }
-                label=""
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="Payment Alerts" secondary="Payment confirmations and receipts" />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={notificationSettings.paymentAlerts}
-                    onChange={handleSettingChange('paymentAlerts')}
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary="Payment Alerts" secondary="Payment confirmations and receipts" />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={notificationSettings.paymentAlerts}
+                        onChange={handleSettingChange('paymentAlerts')}
+                      />
+                    }
+                    label=""
                   />
-                }
-                label=""
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="Promotions" secondary="Special offers and discounts" />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={notificationSettings.promotions}
-                    onChange={handleSettingChange('promotions')}
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary="Promotions" secondary="Special offers and discounts" />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={notificationSettings.promotions}
+                        onChange={handleSettingChange('promotions')}
+                      />
+                    }
+                    label=""
                   />
-                }
-                label=""
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="Safety Alerts" secondary="Emergency and safety notifications" />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={notificationSettings.safetyAlerts}
-                    onChange={handleSettingChange('safetyAlerts')}
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary="Safety Alerts" secondary="Emergency and safety notifications" />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={notificationSettings.safetyAlerts}
+                        onChange={handleSettingChange('safetyAlerts')}
+                      />
+                    }
+                    label=""
                   />
-                }
-                label=""
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="System Updates" secondary="App updates and maintenance" />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={notificationSettings.systemUpdates}
-                    onChange={handleSettingChange('systemUpdates')}
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary="System Updates" secondary="App updates and maintenance" />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={notificationSettings.systemUpdates}
+                        onChange={handleSettingChange('systemUpdates')}
+                      />
+                    }
+                    label=""
                   />
-                }
-                label=""
-              />
-            </ListItem>
-          </List>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowSettingsDialog(false)}>Cancel</Button>
-          <Button onClick={() => setShowSettingsDialog(false)} variant="contained">
-            Save Settings
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+                </ListItem>
+              </List>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setShowSettingsDialog(false)}>Cancel</Button>
+              <Button onClick={() => setShowSettingsDialog(false)} variant="contained">
+                Save Settings
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Container>
+      </Box>
+      <Footer />
+    </Box>
   )
 }
 

@@ -54,7 +54,7 @@ const Analytics = () => {
         <meta name="description" content="UrbanMove Analytics Dashboard" />
       </Helmet>
 
-      <Box sx={{ minHeight: '100vh', background: '#000' }}>
+      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
         <Navbar />
 
         <Container maxWidth="xl" sx={{ py: 8 }}>

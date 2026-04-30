@@ -7,8 +7,8 @@ import { selectTheme } from '../features/uiSlice'
 const steps = [
   {
     number: '01',
-    title: 'Sign Up',
-    description: 'Register with your corporate email. Complete your profile with commute preferences.',
+    title: 'Login',
+    description: 'Login with your corporate email. Access your profile with commute preferences.',
   },
   {
     number: '02',

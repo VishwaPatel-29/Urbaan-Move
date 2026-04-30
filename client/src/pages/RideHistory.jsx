@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Helmet } from 'react-helmet-async'
 import {
   Container,
   Typography,
@@ -24,24 +25,27 @@ import {
   Tooltip,
   Pagination,
   Alert,
-  CircularProgress
+  CircularProgress,
+  useTheme as useMuiTheme
 } from '@mui/material'
 import {
   History,
-  FilterList,
   Search,
   Download,
   Visibility,
   Star,
-  AccessTime,
   LocationOn,
   Payment,
-  CalendarToday,
   TrendingUp,
   TrendingDown
 } from '@mui/icons-material'
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 
 const RideHistory = () => {
+  const theme = useMuiTheme()
+  const isDark = theme.palette.mode === 'dark'
+
   const [rides] = useState([
     {
       id: 'RIDE001',
@@ -197,7 +201,6 @@ const RideHistory = () => {
   }
 
   const handleExport = () => {
-    // Simulate export functionality
     alert('Exporting ride history to CSV...')
   }
 
@@ -205,243 +208,290 @@ const RideHistory = () => {
   const indexOfFirstRide = indexOfLastRide - ridesPerPage
   const currentRides = filteredRides.slice(indexOfFirstRide, indexOfLastRide)
 
+  const cardStyle = {
+    borderRadius: '12px',
+    backgroundColor: theme.palette.background.paper,
+    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
+    boxShadow: 'none',
+  }
+
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom fontWeight="bold">
-        Ride History
-      </Typography>
+    <>
+      <Helmet>
+        <title>Ride History | UrbanMove Enterprise</title>
+      </Helmet>
 
-      {/* Statistics Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center">
-                <History sx={{ mr: 2, color: 'primary.main' }} />
-                <Box>
-                  <Typography variant="h4">{stats.totalRides}</Typography>
-                  <Typography variant="body2" color="text.secondary">Total Rides</Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center">
-                <TrendingUp sx={{ mr: 2, color: 'success.main' }} />
-                <Box>
-                  <Typography variant="h4">{stats.completedRides}</Typography>
-                  <Typography variant="body2" color="text.secondary">Completed</Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center">
-                <TrendingDown sx={{ mr: 2, color: 'error.main' }} />
-                <Box>
-                  <Typography variant="h4">{stats.cancelledRides}</Typography>
-                  <Typography variant="body2" color="text.secondary">Cancelled</Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center">
-                <Payment sx={{ mr: 2, color: 'warning.main' }} />
-                <Box>
-                  <Typography variant="h4">${stats.totalSpent.toFixed(2)}</Typography>
-                  <Typography variant="body2" color="text.secondary">Total Spent</Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: isDark ? '#0a0a0a' : '#f4f6f8' }}>
+        <Navbar />
 
-      {/* Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>Filters</Typography>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={3}>
-              <TextField
-                fullWidth
-                placeholder="Search rides..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: <Search sx={{ mr: 1, color: 'action.active' }} />
-                }}
-                size="small"
-              />
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Status</InputLabel>
-                <Select
-                  value={statusFilter}
-                  label="Status"
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <MenuItem value="all">All Status</MenuItem>
-                  <MenuItem value="completed">Completed</MenuItem>
-                  <MenuItem value="cancelled">Cancelled</MenuItem>
-                  <MenuItem value="ongoing">Ongoing</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Date Range</InputLabel>
-                <Select
-                  value={dateFilter}
-                  label="Date Range"
-                  onChange={(e) => setDateFilter(e.target.value)}
-                >
-                  <MenuItem value="all">All Time</MenuItem>
-                  <MenuItem value="today">Today</MenuItem>
-                  <MenuItem value="week">Last 7 Days</MenuItem>
-                  <MenuItem value="month">Last 30 Days</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <Button
-                variant="outlined"
-                startIcon={<Download />}
-                onClick={handleExport}
-                fullWidth
-              >
-                Export CSV
-              </Button>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-
-      {/* Ride Table */}
-      <Card>
-        <CardContent>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h6">
-              Recent Rides ({filteredRides.length})
-            </Typography>
-            {loading && <CircularProgress size={20} />}
-          </Box>
-
-          {filteredRides.length === 0 ? (
-            <Alert severity="info">No rides found matching your criteria.</Alert>
-          ) : (
-            <TableContainer component={Paper} variant="outlined">
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Ride ID</TableCell>
-                    <TableCell>Date & Time</TableCell>
-                    <TableCell>Pickup</TableCell>
-                    <TableCell>Dropoff</TableCell>
-                    <TableCell>Driver</TableCell>
-                    <TableCell>Fare</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Rating</TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {currentRides.map((ride) => (
-                    <TableRow key={ride.id} hover>
-                      <TableCell>
-                        <Typography variant="body2" fontWeight="medium">
-                          {ride.id}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Box>
-                          <Typography variant="body2">{ride.date}</Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {ride.time}
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Box display="flex" alignItems="center">
-                          <LocationOn sx={{ fontSize: 16, mr: 1, color: 'action.active' }} />
-                          <Typography variant="body2" sx={{ maxWidth: 150 }}>
-                            {ride.pickup}
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Box display="flex" alignItems="center">
-                          <LocationOn sx={{ fontSize: 16, mr: 1, color: 'action.active' }} />
-                          <Typography variant="body2" sx={{ maxWidth: 150 }}>
-                            {ride.dropoff}
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2">{ride.driver}</Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" fontWeight="medium">
-                          ${ride.fare.toFixed(2)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={ride.status}
-                          color={getStatusColor(ride.status)}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        {ride.rating > 0 ? (
-                          <Box display="flex">
-                            {renderStars(ride.rating)}
-                          </Box>
-                        ) : (
-                          <Typography variant="caption" color="text.secondary">
-                            Not rated
-                          </Typography>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Tooltip title="View Details">
-                          <IconButton size="small">
-                            <Visibility />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-
-          {/* Pagination */}
-          {filteredRides.length > ridesPerPage && (
-            <Box display="flex" justifyContent="center" mt={3}>
-              <Pagination
-                count={Math.ceil(filteredRides.length / ridesPerPage)}
-                page={currentPage}
-                onChange={(e, value) => setCurrentPage(value)}
-                color="primary"
-              />
+        <Box sx={{ flexGrow: 1, pt: { xs: '80px', md: '100px' }, pb: 8 }}>
+          <Container maxWidth="lg">
+            
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h4" sx={{ fontWeight: 800, color: theme.palette.text.primary, mb: 1, letterSpacing: '-0.5px' }}>
+                Ride History
+              </Typography>
+              <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
+                Review and export your past transportation logs and billing details.
+              </Typography>
             </Box>
-          )}
-        </CardContent>
-      </Card>
-    </Container>
+
+            {/* Statistics Cards */}
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+              <Grid item xs={12} sm={6} md={3}>
+                <Card sx={cardStyle}>
+                  <CardContent sx={{ p: 3 }}>
+                    <Box display="flex" alignItems="center">
+                      <Box sx={{ p: 1.5, borderRadius: '8px', bgcolor: 'rgba(0, 180, 180, 0.1)', mr: 2 }}>
+                        <History sx={{ color: '#00B4B4' }} />
+                      </Box>
+                      <Box>
+                        <Typography variant="h5" sx={{ fontWeight: 700 }}>{stats.totalRides}</Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>Total Rides</Typography>
+                      </Box>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <Card sx={cardStyle}>
+                  <CardContent sx={{ p: 3 }}>
+                    <Box display="flex" alignItems="center">
+                      <Box sx={{ p: 1.5, borderRadius: '8px', bgcolor: 'rgba(76, 175, 80, 0.1)', mr: 2 }}>
+                        <TrendingUp sx={{ color: 'success.main' }} />
+                      </Box>
+                      <Box>
+                        <Typography variant="h5" sx={{ fontWeight: 700 }}>{stats.completedRides}</Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>Completed</Typography>
+                      </Box>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <Card sx={cardStyle}>
+                  <CardContent sx={{ p: 3 }}>
+                    <Box display="flex" alignItems="center">
+                      <Box sx={{ p: 1.5, borderRadius: '8px', bgcolor: 'rgba(244, 67, 54, 0.1)', mr: 2 }}>
+                        <TrendingDown sx={{ color: 'error.main' }} />
+                      </Box>
+                      <Box>
+                        <Typography variant="h5" sx={{ fontWeight: 700 }}>{stats.cancelledRides}</Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>Cancelled</Typography>
+                      </Box>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <Card sx={cardStyle}>
+                  <CardContent sx={{ p: 3 }}>
+                    <Box display="flex" alignItems="center">
+                      <Box sx={{ p: 1.5, borderRadius: '8px', bgcolor: 'rgba(255, 152, 0, 0.1)', mr: 2 }}>
+                        <Payment sx={{ color: 'warning.main' }} />
+                      </Box>
+                      <Box>
+                        <Typography variant="h5" sx={{ fontWeight: 700 }}>${stats.totalSpent.toFixed(2)}</Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>Total Spent</Typography>
+                      </Box>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+
+            {/* Filters */}
+            <Card sx={{ ...cardStyle, mb: 4 }}>
+              <CardContent sx={{ p: 3 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>Refine Search</Typography>
+                <Grid container spacing={3} alignItems="center">
+                  <Grid item xs={12} md={3}>
+                    <TextField
+                      fullWidth
+                      placeholder="Search ID, driver, location..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      InputProps={{
+                        startAdornment: <Search sx={{ mr: 1, color: 'action.active' }} />
+                      }}
+                      size="small"
+                      sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Status</InputLabel>
+                      <Select
+                        value={statusFilter}
+                        label="Status"
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        sx={{ borderRadius: '8px' }}
+                      >
+                        <MenuItem value="all">All Status</MenuItem>
+                        <MenuItem value="completed">Completed</MenuItem>
+                        <MenuItem value="cancelled">Cancelled</MenuItem>
+                        <MenuItem value="ongoing">Ongoing</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Date Range</InputLabel>
+                      <Select
+                        value={dateFilter}
+                        label="Date Range"
+                        onChange={(e) => setDateFilter(e.target.value)}
+                        sx={{ borderRadius: '8px' }}
+                      >
+                        <MenuItem value="all">All Time</MenuItem>
+                        <MenuItem value="today">Today</MenuItem>
+                        <MenuItem value="week">Last 7 Days</MenuItem>
+                        <MenuItem value="month">Last 30 Days</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <Button
+                      variant="outlined"
+                      startIcon={<Download />}
+                      onClick={handleExport}
+                      fullWidth
+                      sx={{ py: 1, borderRadius: '8px', textTransform: 'none', fontWeight: 600, borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', color: theme.palette.text.primary }}
+                    >
+                      Export CSV
+                    </Button>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            {/* Ride Table */}
+            <Card sx={{ ...cardStyle, overflow: 'hidden' }}>
+              <CardContent sx={{ p: 0 }}>
+                <Box display="flex" justifyContent="space-between" alignItems="center" p={3} borderBottom={`1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`}>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    Recent Rides ({filteredRides.length})
+                  </Typography>
+                  {loading && <CircularProgress size={20} sx={{ color: '#00B4B4' }} />}
+                </Box>
+
+                {filteredRides.length === 0 ? (
+                  <Box p={4}>
+                    <Alert severity="info" sx={{ borderRadius: '8px' }}>No rides found matching your search criteria.</Alert>
+                  </Box>
+                ) : (
+                  <TableContainer>
+                    <Table>
+                      <TableHead sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }}>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 600 }}>Ride ID</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Date & Time</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Pickup</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Dropoff</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Driver</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Fare</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Rating</TableCell>
+                          <TableCell sx={{ fontWeight: 600, textAlign: 'right' }}>Actions</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {currentRides.map((ride) => (
+                          <TableRow key={ride.id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                            <TableCell>
+                              <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.text.primary }}>
+                                {ride.id}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Box>
+                                <Typography variant="body2" sx={{ fontWeight: 500 }}>{ride.date}</Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {ride.time}
+                                </Typography>
+                              </Box>
+                            </TableCell>
+                            <TableCell>
+                              <Box display="flex" alignItems="center">
+                                <LocationOn sx={{ fontSize: 16, mr: 1, color: 'action.active' }} />
+                                <Typography variant="body2" sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {ride.pickup}
+                                </Typography>
+                              </Box>
+                            </TableCell>
+                            <TableCell>
+                              <Box display="flex" alignItems="center">
+                                <LocationOn sx={{ fontSize: 16, mr: 1, color: 'action.active' }} />
+                                <Typography variant="body2" sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {ride.dropoff}
+                                </Typography>
+                              </Box>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2">{ride.driver}</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                ${ride.fare.toFixed(2)}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                label={ride.status.toUpperCase()}
+                                color={getStatusColor(ride.status)}
+                                size="small"
+                                sx={{ borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              {ride.rating > 0 ? (
+                                <Box display="flex">
+                                  {renderStars(ride.rating)}
+                                </Box>
+                              ) : (
+                                <Typography variant="caption" color="text.secondary">
+                                  N/A
+                                </Typography>
+                              )}
+                            </TableCell>
+                            <TableCell align="right">
+                              <Tooltip title="View Details">
+                                <IconButton size="small" sx={{ color: theme.palette.text.secondary }}>
+                                  <Visibility fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
+
+                {/* Pagination */}
+                {filteredRides.length > ridesPerPage && (
+                  <Box display="flex" justifyContent="center" p={3} borderTop={`1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`}>
+                    <Pagination
+                      count={Math.ceil(filteredRides.length / ridesPerPage)}
+                      page={currentPage}
+                      onChange={(e, value) => setCurrentPage(value)}
+                      sx={{ 
+                        '& .MuiPaginationItem-root.Mui-selected': { 
+                          bgcolor: '#00B4B4', 
+                          color: '#fff',
+                          '&:hover': { bgcolor: '#008080' }
+                        }
+                      }}
+                    />
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </Container>
+        </Box>
+        <Footer />
+      </Box>
+    </>
   )
 }
 

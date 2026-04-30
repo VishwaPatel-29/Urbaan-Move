@@ -23,7 +23,7 @@ const NotFound = () => {
         alignItems: 'center',
         justifyContent: 'center',
         textAlign: 'center',
-        background: '#000',
+        bgcolor: 'background.default',
         px: 2,
       }}
     >

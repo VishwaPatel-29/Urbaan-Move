@@ -45,6 +45,7 @@ import ThemeToggle from './ThemeToggle'
 
 const Navbar = () => {
   const theme = useTheme()
+  const isDark = theme.palette.mode === 'dark'
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const navigate = useNavigate()
   const location = useLocation()
@@ -103,63 +104,102 @@ const Navbar = () => {
   ]
 
   const drawer = (
-    <Box sx={{ width: 280, py: 2 }}>
+    <Box sx={{ width: 280, py: 3 }}>
       <Box sx={{ px: 3, mb: 3 }}>
-        <Typography variant="h6" sx={{ fontWeight: 600, color: '#fff' }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.text.primary, letterSpacing: '-0.5px' }}>
           UrbanMove
         </Typography>
-        <Typography variant="body2" sx={{ color: '#ccc' }}>
+        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
           Corporate Shuttle Platform
         </Typography>
       </Box>
-      <Divider sx={{ mb: 2, borderColor: 'rgba(255,255,255,0.2)' }} />
-      <List>
-        {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton
-              onClick={() => navigate(item.path)}
-              selected={location.pathname === item.path}
-              sx={{
-                '&.Mui-selected': {
-                  backgroundColor: 'rgba(0, 180, 180, 0.2)',
-                  color: '#00B4B4',
-                  '& .MuiListItemIcon-root': {
-                    color: '#00B4B4',
+      <Divider sx={{ mb: 2, borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }} />
+      <List sx={{ px: 2 }}>
+        {menuItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
+              <ListItemButton
+                onClick={() => {
+                  navigate(item.path);
+                  handleMobileMenuToggle();
+                }}
+                selected={isActive}
+                sx={{
+                  borderRadius: '12px',
+                  color: isActive ? '#00B4B4' : theme.palette.text.primary,
+                  backgroundColor: isActive ? (isDark ? 'rgba(0, 180, 180, 0.15)' : 'rgba(0, 180, 180, 0.1)') : 'transparent',
+                  transition: 'all 0.2s',
+                  '&:hover': {
+                    backgroundColor: isActive ? (isDark ? 'rgba(0, 180, 180, 0.2)' : 'rgba(0, 180, 180, 0.15)') : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'),
                   },
-                },
-                mx: 1,
-                borderRadius: 1,
-                color: '#fff',
-              }}
-            >
-              <ListItemIcon sx={{ color: '#ccc' }}>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
+                  '&.Mui-selected': {
+                    backgroundColor: isDark ? 'rgba(0, 180, 180, 0.15)' : 'rgba(0, 180, 180, 0.1)',
+                    '&:hover': {
+                      backgroundColor: isDark ? 'rgba(0, 180, 180, 0.2)' : 'rgba(0, 180, 180, 0.15)',
+                    }
+                  }
+                }}
+              >
+                <ListItemIcon sx={{ color: isActive ? '#00B4B4' : theme.palette.text.secondary, minWidth: 40 }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText 
+                  primary={item.text} 
+                  primaryTypographyProps={{ 
+                    fontWeight: isActive ? 600 : 500,
+                    fontSize: '0.95rem'
+                  }} 
+                />
+              </ListItemButton>
+            </ListItem>
+          )
+        })}
       </List>
     </Box>
   )
+
+  const getNavButtonStyle = (path) => {
+    const isActive = location.pathname === path;
+    return {
+      color: isActive ? '#00B4B4' : theme.palette.text.secondary,
+      fontWeight: isActive ? 600 : 500,
+      textTransform: 'none',
+      px: 2.5,
+      py: 1,
+      borderRadius: '20px',
+      transition: 'all 0.2s ease',
+      backgroundColor: isActive ? (isDark ? 'rgba(0, 180, 180, 0.15)' : 'rgba(0, 180, 180, 0.1)') : 'transparent',
+      '&:hover': {
+        backgroundColor: isActive 
+          ? (isDark ? 'rgba(0, 180, 180, 0.25)' : 'rgba(0, 180, 180, 0.15)') 
+          : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'),
+        color: isActive ? '#00B4B4' : theme.palette.text.primary,
+      },
+    }
+  }
 
   return (
     <>
       <AppBar
         position="fixed"
         sx={{
-          background: 'rgba(0, 0, 0, 0.95)',
-          backdropFilter: 'blur(10px)',
-          borderBottom: '1px solid rgba(0, 180, 180, 0.2)',
-          boxShadow: 'none',
+          background: isDark ? 'rgba(10, 10, 10, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(16px)',
+          borderBottom: '1px solid',
+          borderColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+          boxShadow: isDark ? 'none' : '0 4px 30px rgba(0, 0, 0, 0.03)',
+          transition: 'background 0.3s, border-color 0.3s',
         }}
       >
-        <Toolbar sx={{ minHeight: 64 }}>
+        <Toolbar sx={{ minHeight: { xs: 64, md: 72 }, px: { xs: 2, md: 4 } }}>
           {isMobile && (
             <IconButton
               color="inherit"
               aria-label="open drawer"
               onClick={handleMobileMenuToggle}
               edge="start"
-              sx={{ mr: 2, color: '#fff' }}
+              sx={{ mr: 2, color: theme.palette.text.primary }}
             >
               <MenuIcon />
             </IconButton>
@@ -173,6 +213,8 @@ const Navbar = () => {
               alignItems: 'center',
               cursor: 'pointer',
               mr: 'auto',
+              transition: 'opacity 0.2s',
+              '&:hover': { opacity: 0.8 }
             }}
           >
             <Box
@@ -180,8 +222,9 @@ const Navbar = () => {
               src={import.meta.env.BASE_URL + "logo.svg"}
               alt="UrbanMove"
               sx={{
-                height: 60,
+                height: 48,
                 width: 'auto',
+                filter: isDark ? 'brightness(1.2)' : 'none',
               }}
               onError={(e) => {
                 e.target.style.display = 'none';
@@ -191,10 +234,11 @@ const Navbar = () => {
             <Typography
               variant="h6"
               sx={{
-                fontWeight: 700,
-                color: '#00B4B4',
+                fontWeight: 800,
+                color: theme.palette.text.primary,
                 display: 'none',
-                fontSize: { xs: '1.2rem', sm: '1.5rem' }
+                letterSpacing: '-0.5px',
+                fontSize: { xs: '1.2rem', sm: '1.4rem' }
               }}
             >
               UrbanMove
@@ -202,38 +246,14 @@ const Navbar = () => {
           </Box>
 
           {/* Right Side Navigation Items */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, md: 1.5 } }}>
             {/* Quick Actions - Desktop */}
             {!isMobile && (
-              <>
-                <Button
-                  onClick={() => navigate('/dashboard')}
-                  sx={{
-                    color: location.pathname === '/dashboard' ? '#00B4B4' : 'rgba(255, 255, 255, 0.8)',
-                    fontWeight: 500,
-                    textTransform: 'none',
-                    px: 2,
-                    '&:hover': {
-                      backgroundColor: 'rgba(0, 180, 180, 0.1)',
-                      color: '#00B4B4',
-                    },
-                  }}
-                >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 1 }}>
+                <Button onClick={() => navigate('/dashboard')} sx={getNavButtonStyle('/dashboard')}>
                   Dashboard
                 </Button>
-                <Button
-                  onClick={() => navigate('/rides')}
-                  sx={{
-                    color: location.pathname === '/rides' ? '#00B4B4' : 'rgba(255, 255, 255, 0.8)',
-                    fontWeight: 500,
-                    textTransform: 'none',
-                    px: 2,
-                    '&:hover': {
-                      backgroundColor: 'rgba(0, 180, 180, 0.1)',
-                      color: '#00B4B4',
-                    },
-                  }}
-                >
+                <Button onClick={() => navigate('/rides')} sx={getNavButtonStyle('/rides')}>
                   My Rides
                 </Button>
                 <Button
@@ -241,55 +261,82 @@ const Navbar = () => {
                   variant="contained"
                   sx={{
                     backgroundColor: '#00B4B4',
-                    color: 'white',
-                    fontWeight: 500,
+                    color: '#ffffff',
+                    fontWeight: 600,
                     textTransform: 'none',
                     px: 3,
+                    py: 1,
+                    ml: 1,
+                    borderRadius: '24px',
+                    boxShadow: '0 4px 14px rgba(0, 180, 180, 0.3)',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
-                      backgroundColor: '#008080',
+                      backgroundColor: '#009090',
+                      boxShadow: '0 6px 20px rgba(0, 180, 180, 0.4)',
+                      transform: 'translateY(-1px)',
                     },
+                    '&:active': {
+                      transform: 'translateY(1px)',
+                      boxShadow: '0 2px 10px rgba(0, 180, 180, 0.3)',
+                    }
                   }}
                 >
                   Book a Ride
                 </Button>
-              </>
+              </Box>
             )}
 
             {/* Notifications */}
-            <Tooltip title="Notifications">
-              <IconButton
-                color="inherit"
-                onClick={() => navigate('/notifications')}
-                sx={{
-                  color: 'rgba(255, 255, 255, 0.8)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(0, 180, 180, 0.1)',
-                    color: '#00B4B4',
-                  },
-                }}
-              >
-                <Badge badgeContent={unreadCount} color="error">
-                  🔔
-                </Badge>
-              </IconButton>
-            </Tooltip>
+            {isAuthenticated && (
+              <Tooltip title="Notifications">
+                <IconButton
+                  onClick={handleNotificationOpen}
+                  sx={{
+                    color: theme.palette.text.secondary,
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+                    '&:hover': {
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                      color: theme.palette.text.primary,
+                      transform: 'scale(1.05)',
+                    },
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <Badge 
+                    badgeContent={unreadCount} 
+                    color="error"
+                    sx={{
+                      '& .MuiBadge-badge': {
+                        boxShadow: `0 0 0 2px ${isDark ? '#000' : '#fff'}`,
+                      }
+                    }}
+                  >
+                    <Notifications fontSize="small" />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
+            )}
 
             {/* Settings */}
-            <Tooltip title="Settings">
-              <IconButton
-                color="inherit"
-                onClick={() => navigate('/settings')}
-                sx={{
-                  color: 'rgba(255, 255, 255, 0.8)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(0, 180, 180, 0.1)',
-                    color: '#00B4B4',
-                  },
-                }}
-              >
-                ⚙️
-              </IconButton>
-            </Tooltip>
+            {isAuthenticated && (
+              <Tooltip title="Settings">
+                <IconButton
+                  onClick={() => navigate('/settings')}
+                  sx={{
+                    color: theme.palette.text.secondary,
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+                    '&:hover': {
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                      color: theme.palette.text.primary,
+                      transform: 'scale(1.05)',
+                    },
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <Settings fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
 
             {/* Login Button */}
             {!isAuthenticated && (
@@ -297,10 +344,11 @@ const Navbar = () => {
                 onClick={() => navigate('/login')}
                 variant="outlined"
                 sx={{
-                  borderColor: '#00B4B4',
+                  borderColor: isDark ? 'rgba(0, 180, 180, 0.5)' : '#00B4B4',
                   color: '#00B4B4',
-                  fontWeight: 500,
+                  fontWeight: 600,
                   textTransform: 'none',
+                  borderRadius: '20px',
                   px: 3,
                   '&:hover': {
                       backgroundColor: 'rgba(0, 180, 180, 0.1)',
@@ -319,16 +367,27 @@ const Navbar = () => {
                   <IconButton
                     onClick={handleProfileMenuOpen}
                     sx={{
-                      ml: 1,
+                      ml: 0.5,
+                      p: 0.5,
+                      border: '2px solid transparent',
+                      transition: 'border-color 0.2s',
+                      ...(Boolean(profileAnchor) && {
+                        borderColor: '#00B4B4',
+                      }),
                       '&:hover': {
-                        backgroundColor: 'rgba(0, 180, 180, 0.1)',
+                        borderColor: 'rgba(0, 180, 180, 0.5)',
                       },
                     }}
                   >
                     <Avatar
                       src={user?.avatar}
                       alt={user?.name}
-                      sx={{ width: 36, height: 36 }}
+                      sx={{ 
+                        width: 36, 
+                        height: 36,
+                        backgroundColor: '#00B4B4',
+                        fontWeight: 600,
+                      }}
                     >
                       {user?.name?.charAt(0) || <AccountCircle />}
                     </Avatar>
@@ -340,44 +399,69 @@ const Navbar = () => {
                   anchorEl={profileAnchor}
                   open={Boolean(profileAnchor)}
                   onClose={handleProfileMenuClose}
+                  transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                   PaperProps={{
+                    elevation: 0,
                     sx: {
-                      mt: 1,
-                      minWidth: 200,
-                      backgroundColor: 'rgba(0, 0, 0, 0.95)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(0, 180, 180, 0.2)',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                      mt: 1.5,
+                      minWidth: 240,
+                      backgroundColor: isDark ? 'rgba(20, 20, 20, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid',
+                      borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+                      boxShadow: isDark ? '0 12px 40px rgba(0,0,0,0.5)' : '0 12px 40px rgba(0,0,0,0.1)',
+                      borderRadius: '16px',
+                      overflow: 'hidden',
+                      '& .MuiMenuItem-root': {
+                        mx: 1,
+                        my: 0.5,
+                        borderRadius: '8px',
+                        color: theme.palette.text.primary,
+                        fontSize: '0.95rem',
+                        '&:hover': {
+                          backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                        }
+                      }
                     }
                   }}
                 >
-                  <Box sx={{ px: 2, py: 1 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#fff' }}>
+                  <Box sx={{ px: 3, py: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <Avatar
+                      src={user?.avatar}
+                      sx={{ width: 56, height: 56, mb: 1, backgroundColor: '#00B4B4', fontSize: '1.5rem' }}
+                    >
+                      {user?.name?.charAt(0)}
+                    </Avatar>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: theme.palette.text.primary }}>
                       {user?.name || 'User'}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#ccc', fontSize: '0.875rem' }}>
+                    <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
                       {user?.email || 'user@example.com'}
                     </Typography>
                   </Box>
-                  <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)' }} />
-                  <MenuItem onClick={() => { navigate('/profile'); handleProfileMenuClose(); }} sx={{ color: '#fff' }}>
-                    <Person sx={{ mr: 1 }} /> Profile
+                  <Divider sx={{ borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', my: 1 }} />
+                  <MenuItem onClick={() => { navigate('/profile'); handleProfileMenuClose(); }}>
+                    <Person sx={{ mr: 1.5, color: theme.palette.text.secondary, fontSize: 20 }} /> Profile
                   </MenuItem>
-                  <MenuItem onClick={() => { navigate('/settings'); handleProfileMenuClose(); }} sx={{ color: '#fff' }}>
-                    <Settings sx={{ mr: 1 }} /> Settings
+                  <MenuItem onClick={() => { navigate('/settings'); handleProfileMenuClose(); }}>
+                    <Settings sx={{ mr: 1.5, color: theme.palette.text.secondary, fontSize: 20 }} /> Settings
                   </MenuItem>
                   {user?.role === 'admin' && (
-                    <MenuItem onClick={() => { navigate('/admin'); handleProfileMenuClose(); }} sx={{ color: '#fff' }}>
-                      <AdminPanelSettings sx={{ mr: 1 }} /> Admin Panel
+                    <MenuItem onClick={() => { navigate('/admin'); handleProfileMenuClose(); }}>
+                      <AdminPanelSettings sx={{ mr: 1.5, color: '#00B4B4', fontSize: 20 }} /> Admin Panel
                     </MenuItem>
                   )}
-                  <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)' }} />
-                  <MenuItem onClick={handleLogout} sx={{ color: '#fff' }}>
-                    <Logout sx={{ mr: 1 }} /> Logout
+                  <Divider sx={{ borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', my: 1 }} />
+                  <MenuItem onClick={handleLogout} sx={{ color: '#d32f2f !important' }}>
+                    <Logout sx={{ mr: 1.5, fontSize: 20 }} /> Logout
                   </MenuItem>
                 </Menu>
               </>
             )}
+
+            {/* Divider between profile and theme toggle */}
+            <Divider orientation="vertical" variant="middle" flexItem sx={{ mx: 0.5, borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
 
             {/* Theme Toggle - Always at the end */}
             <ThemeToggle />
@@ -392,9 +476,11 @@ const Navbar = () => {
         onClose={handleMobileMenuToggle}
         PaperProps={{
           sx: {
-            backgroundColor: 'rgba(0, 0, 0, 0.95)',
-            backdropFilter: 'blur(10px)',
-            borderRight: '1px solid rgba(0, 180, 180, 0.2)',
+            backgroundColor: isDark ? 'rgba(15, 15, 15, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(20px)',
+            borderRight: '1px solid',
+            borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+            boxShadow: isDark ? '4px 0 24px rgba(0,0,0,0.5)' : '4px 0 24px rgba(0,0,0,0.05)',
           }
         }}
       >
@@ -407,31 +493,40 @@ const Navbar = () => {
           anchorEl={notificationAnchor}
           open={Boolean(notificationAnchor)}
           onClose={handleNotificationClose}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           PaperProps={{
+            elevation: 0,
             sx: {
-              mt: 1,
+              mt: 1.5,
               minWidth: 320,
               maxWidth: 400,
               maxHeight: 400,
-              backgroundColor: 'rgba(0, 0, 0, 0.95)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(0, 180, 180, 0.2)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+              backgroundColor: isDark ? 'rgba(20, 20, 20, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid',
+              borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+              boxShadow: isDark ? '0 12px 40px rgba(0,0,0,0.5)' : '0 12px 40px rgba(0,0,0,0.1)',
+              borderRadius: '16px',
             }
           }}
         >
-          <Box sx={{ px: 2, py: 1 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#fff' }}>
+          <Box sx={{ px: 3, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: theme.palette.text.primary }}>
               Notifications
             </Typography>
+            {unreadCount > 0 && (
+              <Badge badgeContent={unreadCount} color="error" sx={{ mr: 2 }} />
+            )}
           </Box>
-          <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)' }} />
-          <MenuItem onClick={handleNotificationClose} sx={{ color: '#fff' }}>
-            <Box>
-              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+          <Divider sx={{ borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }} />
+          <MenuItem onClick={handleNotificationClose} sx={{ py: 3, display: 'flex', justifyContent: 'center', '&:hover': { backgroundColor: 'transparent' } }}>
+            <Box sx={{ textAlign: 'center' }}>
+              <Notifications sx={{ fontSize: 40, color: theme.palette.text.disabled, mb: 1, opacity: 0.5 }} />
+              <Typography variant="body2" sx={{ fontWeight: 500, color: theme.palette.text.primary }}>
                 No new notifications
               </Typography>
-              <Typography variant="caption" sx={{ color: '#ccc' }}>
+              <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
                 You're all caught up!
               </Typography>
             </Box>

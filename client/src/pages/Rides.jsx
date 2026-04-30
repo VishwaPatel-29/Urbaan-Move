@@ -17,32 +17,37 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  CircularProgress,
+  useTheme as useMuiTheme,
+  Container,
+  Divider,
 } from '@mui/material'
 import {
-  DirectionsCar,
+  DirectionsBus,
   Cancel,
   RateReview,
   AccessTime,
   LocationOn,
   ExpandMore,
+  DirectionsCar,
+  FileDownload
 } from '@mui/icons-material'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { selectTheme } from '../features/uiSlice'
-import { formatDateTime, formatDuration, formatRideStatus } from '../utils/formatters'
+import { formatDateTime, formatRideStatus } from '../utils/formatters'
 import Navbar from '../components/Navbar'
-import Sidebar from '../components/Sidebar'
-import LottieLoader from '../components/LottieLoader'
+import Footer from '../components/Footer'
+import SkeletonLoader from '../components/SkeletonLoader'
+import EmptyState from '../components/EmptyState'
 
 const Rides = () => {
-  const theme = useSelector(selectTheme)
+  const theme = useMuiTheme()
+  const isDark = theme.palette.mode === 'dark'
+  
   const [tab, setTab] = useState(0)
   const [loading, setLoading] = useState(true)
   const [rides, setRides] = useState([])
@@ -53,7 +58,7 @@ const Rides = () => {
     const fetchRides = async () => {
       setLoading(true)
       try {
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 1500)) // Simulated delay to show skeletons
         setRides(sampleRides)
       } catch (error) {
         toast.error('Failed to load rides')
@@ -71,284 +76,333 @@ const Rides = () => {
   }
 
   const getStatusColor = (status) => {
-    const colors = {
-      pending: '#FFB6C1',
-      accepted: '#00B4B4',
-      'en-route': '#2196f3',
-      arrived: '#4caf50',
-      completed: '#9e9e9e',
-      cancelled: '#ff5252',
+    switch(status) {
+      case 'en-route':
+      case 'arrived':
+      case 'upcoming': return { bg: isDark ? 'rgba(0, 180, 180, 0.2)' : '#e0f2f1', text: '#00897b' }
+      case 'completed': return { bg: isDark ? 'rgba(76, 175, 80, 0.2)' : '#e8f5e9', text: '#2e7d32' }
+      case 'cancelled': return { bg: isDark ? 'rgba(244, 67, 54, 0.2)' : '#ffebee', text: '#c62828' }
+      case 'pending': return { bg: isDark ? 'rgba(255, 182, 193, 0.2)' : '#fce4ec', text: '#d81b60' }
+      default: return { bg: theme.palette.action.selected, text: theme.palette.text.secondary }
     }
-    return colors[status] || '#666'
   }
 
   const filteredRides = tab === 0 ? rides : tab === 1 ? rides.filter(r => r.status === 'completed') : rides.filter(r => r.status === 'cancelled')
 
   const sampleRides = [
     {
-      _id: '1',
+      _id: 'TR-8933',
       pickup: '123 Main Street',
       destination: 'Tech Park Campus',
       date: new Date().toISOString(),
-      status: 'en-route',
-      eta: 5,
+      status: 'upcoming',
       driver: 'John Smith',
-      vehicle: 'Van 001',
+      vehicle: 'Shuttle 4B',
     },
     {
-      _id: '2',
+      _id: 'TR-8932',
       pickup: '456 Oak Avenue',
       destination: 'Innovation Hub',
       date: new Date(Date.now() - 86400000).toISOString(),
       status: 'completed',
-      eta: 0,
       driver: 'Jane Doe',
-      vehicle: 'Van 002',
+      vehicle: 'Express Van',
     },
     {
-      _id: '3',
+      _id: 'TR-8931',
       pickup: '789 Pine Road',
       destination: 'Corporate Center',
       date: new Date(Date.now() - 172800000).toISOString(),
       status: 'cancelled',
-      eta: 0,
       driver: null,
       vehicle: null,
     },
     {
-      _id: '4',
+      _id: 'TR-8930',
       pickup: '321 Elm Street',
       destination: 'Headquarters',
       date: new Date(Date.now() - 259200000).toISOString(),
       status: 'completed',
-      eta: 0,
       driver: 'Mike Johnson',
-      vehicle: 'Van 003',
+      vehicle: 'Shuttle 2A',
     },
   ]
 
+  // Enterprise Styling
+  const cardStyle = {
+    borderRadius: '12px',
+    backgroundColor: theme.palette.background.paper,
+    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
+    boxShadow: isDark ? '0 4px 6px rgba(0,0,0,0.2)' : '0 1px 3px rgba(0,0,0,0.04)',
+    overflow: 'hidden'
+  }
+
   return (
-    <>
+    <Box sx={{ 
+      minHeight: '100vh', 
+      bgcolor: isDark ? '#0a0a0a' : '#f4f6f8',
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif'
+    }}>
       <Helmet>
         <title>My Rides | UrbanMove</title>
-        <meta name="description" content="View your ride history with UrbanMove." />
       </Helmet>
 
-      <Box sx={{ minHeight: '100vh', background: theme === 'dark' ? '#000' : '#f5f5f5' }}>
-        <Navbar />
+      <Navbar />
 
-        <Box sx={{ display: 'flex', pt: 8 }}>
-          <Sidebar open={true} />
-
-          <Box
-            component={motion.main}
-            initial={{ opacity: 0, x: 200 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3 }}
-            sx={{ flex: 1, p: { xs: 2, md: 4 }, ml: 280 }}
-          >
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-              <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                My Rides
+      <Box sx={{ pt: { xs: '80px', md: '100px' }, pb: 8 }}>
+        <Container maxWidth="xl">
+          
+          {/* Header */}
+          <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.text.primary, mb: 0.5 }}>
+                Ride History
               </Typography>
-              <Button
-                component={Link}
-                to="/book"
-                variant="contained"
-                startIcon={<DirectionsCar />}
-                sx={{
-                  background: 'linear-gradient(135deg, #00B4B4 0%, #008080 100%)',
-                }}
-              >
+              <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
+                View and manage your past and upcoming commutes.
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Button variant="outlined" startIcon={<FileDownload />} sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600, borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', color: theme.palette.text.primary }}>
+                Export Data
+              </Button>
+              <Button component={Link} to="/book" variant="contained" startIcon={<DirectionsCar />} sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600, backgroundColor: '#00B4B4', '&:hover': { backgroundColor: '#008080' }, boxShadow: 'none' }}>
                 Book New Ride
               </Button>
             </Box>
+          </Box>
 
-            <Card>
-              <CardContent sx={{ p: 0 }}>
-                <Tabs
-                  value={tab}
-                  onChange={(e, newValue) => setTab(newValue)}
-                  sx={{
-                    borderBottom: `1px solid ${theme === 'dark' ? '#333' : '#e0e0e0'}`,
-                    '& .MuiTab-root': { minWidth: 100 },
-                  }}
-                >
-                  <Tab label={`All (${rides.length})`} />
-                  <Tab label={`Completed (${rides.filter(r => r.status === 'completed').length})`} />
-                  <Tab label={`Cancelled (${rides.filter(r => r.status === 'cancelled').length})`} />
-                </Tabs>
+          <Card sx={cardStyle} elevation={0}>
+            <Box sx={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>
+              <Tabs
+                value={tab}
+                onChange={(e, newValue) => setTab(newValue)}
+                sx={{
+                  px: 2,
+                  '& .MuiTab-root': { 
+                    minWidth: 100, 
+                    fontWeight: 600, 
+                    textTransform: 'none',
+                    color: theme.palette.text.secondary,
+                    '&.Mui-selected': { color: '#00B4B4' }
+                  },
+                  '& .MuiTabs-indicator': { backgroundColor: '#00B4B4' }
+                }}
+              >
+                <Tab label={`All Rides (${rides.length})`} />
+                <Tab label={`Completed (${rides.filter(r => r.status === 'completed').length})`} />
+                <Tab label={`Cancelled (${rides.filter(r => r.status === 'cancelled').length})`} />
+              </Tabs>
+            </Box>
 
-                {loading ? (
-                  <Box sx={{ textAlign: 'center', py: 8 }}>
-                    <LottieLoader height={100} width={100} />
-                  </Box>
-                ) : filteredRides.length === 0 ? (
-                  <Box sx={{ textAlign: 'center', py: 8 }}>
-                    <DirectionsCar sx={{ fontSize: 64, color: '#333', mb: 2 }} />
-                    <Typography variant="h6" sx={{ color: '#666' }}>
-                      No rides found
-                    </Typography>
-                    <Button
-                      component={Link}
-                      to="/book"
-                      variant="outlined"
-                      sx={{ mt: 2, borderColor: '#00B4B4', color: '#00B4B4' }}
-                    >
-                      Book Your First Ride
-                    </Button>
-                  </Box>
-                ) : (
-                  <TableContainer>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Date</TableCell>
-                          <TableCell>Pickup</TableCell>
-                          <TableCell>Destination</TableCell>
-                          <TableCell>Status</TableCell>
-                          <TableCell>Driver</TableCell>
-                          <TableCell align="right">Actions</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {filteredRides.map((ride) => (
+            <CardContent sx={{ p: 0 }}>
+              {loading ? (
+                <TableContainer>
+                  <Table>
+                    <TableBody>
+                      <SkeletonLoader type="table" rows={5} columns={5} />
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : filteredRides.length === 0 ? (
+                <EmptyState
+                  icon={DirectionsCar}
+                  title="No rides found"
+                  description="You haven't taken any rides in this category yet. Ready for your first commute?"
+                  actionText="Book Your First Ride"
+                  actionLink="/book"
+                />
+              ) : (
+                <TableContainer>
+                  <Table>
+                    <TableHead sx={{ backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#f9fafb' }}>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: 600, color: theme.palette.text.secondary, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>Ride ID / Date</TableCell>
+                        <TableCell sx={{ fontWeight: 600, color: theme.palette.text.secondary, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>Route details</TableCell>
+                        <TableCell sx={{ fontWeight: 600, color: theme.palette.text.secondary, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>Status</TableCell>
+                        <TableCell sx={{ fontWeight: 600, color: theme.palette.text.secondary, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>Vehicle</TableCell>
+                        <TableCell align="right" sx={{ fontWeight: 600, color: theme.palette.text.secondary, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>Actions</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {filteredRides.map((ride) => {
+                        const statusColor = getStatusColor(ride.status)
+                        return (
                           <TableRow
                             key={ride._id}
-                            sx={{ '&:hover': { background: 'rgba(0, 180, 180, 0.05)' } }}
+                            hover
+                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                           >
-                            <TableCell>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <AccessTime sx={{ color: '#00B4B4', fontSize: 20 }} />
-                                <Box>
-                                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                    {formatDateTime(ride.date).split(' at ')[0]}
-                                  </Typography>
-                                  <Typography variant="caption" sx={{ color: '#666' }}>
-                                    {formatDateTime(ride.date).split(' at ')[1]}
-                                  </Typography>
+                            <TableCell sx={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'}` }}>
+                              <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.text.primary }}>
+                                {ride._id}
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
+                                {formatDateTime(ride.date)}
+                              </Typography>
+                            </TableCell>
+                            <TableCell sx={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'}` }}>
+                              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+                                  <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#00B4B4', mr: 1 }} />
+                                  <Typography variant="body2" sx={{ color: theme.palette.text.primary }}>{ride.pickup}</Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                  <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#ec4899', mr: 1 }} />
+                                  <Typography variant="body2" sx={{ color: theme.palette.text.primary }}>{ride.destination}</Typography>
                                 </Box>
                               </Box>
                             </TableCell>
-                            <TableCell>
-                              <Typography variant="body2">{ride.pickup}</Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant="body2">{ride.destination}</Typography>
-                            </TableCell>
-                            <TableCell>
+                            <TableCell sx={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'}` }}>
                               <Chip
                                 label={formatRideStatus(ride.status)}
                                 size="small"
                                 sx={{
-                                  background: `${getStatusColor(ride.status)}20`,
-                                  color: getStatusColor(ride.status),
+                                  backgroundColor: statusColor.bg,
+                                  color: statusColor.text,
                                   fontWeight: 600,
+                                  borderRadius: '6px'
                                 }}
                               />
                             </TableCell>
-                            <TableCell>
-                              <Typography variant="body2">
-                                {ride.driver || '-'}
+                            <TableCell sx={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'}` }}>
+                              <Typography variant="body2" sx={{ color: theme.palette.text.primary, fontWeight: 500 }}>
+                                {ride.vehicle || '-'}
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
+                                {ride.driver || ''}
                               </Typography>
                             </TableCell>
-                            <TableCell align="right">
-                              <IconButton
+                            <TableCell align="right" sx={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'}` }}>
+                              <Button
                                 size="small"
+                                variant="outlined"
                                 onClick={() => {
                                   setSelectedRide(ride)
                                   setDetailsOpen(true)
                                 }}
+                                sx={{ borderRadius: '6px', textTransform: 'none', borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', color: theme.palette.text.primary }}
                               >
-                                <ExpandMore />
-                              </IconButton>
+                                Details
+                              </Button>
                             </TableCell>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                )}
-              </CardContent>
-            </Card>
-          </Box>
-        </Box>
+                        )
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </CardContent>
+          </Card>
+        </Container>
+      </Box>
 
-        <Dialog
-          open={detailsOpen}
-          onClose={() => setDetailsOpen(false)}
-          maxWidth="sm"
-          fullWidth
-        >
-          {selectedRide && (
+      {/* Ride Details Dialog */}
+      <Dialog
+        open={detailsOpen}
+        onClose={() => setDetailsOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: '16px',
+            backgroundImage: 'none',
+            backgroundColor: theme.palette.background.paper,
+          }
+        }}
+      >
+        {selectedRide && (() => {
+          const statusColor = getStatusColor(selectedRide.status)
+          return (
             <>
-              <DialogTitle>Ride Details</DialogTitle>
-              <DialogContent>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <LocationOn sx={{ color: '#00B4B4' }} />
-                    <Box>
-                      <Typography variant="caption" sx={{ color: '#666' }}>Pickup</Typography>
-                      <Typography variant="body1">{selectedRide.pickup}</Typography>
-                    </Box>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <LocationOn sx={{ color: '#FFB6C1' }} />
-                    <Box>
-                      <Typography variant="caption" sx={{ color: '#666' }}>Destination</Typography>
-                      <Typography variant="body1">{selectedRide.destination}</Typography>
-                    </Box>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <DialogTitle sx={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`, pb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>Ticket Details</Typography>
+                <Chip
+                  label={formatRideStatus(selectedRide.status)}
+                  size="small"
+                  sx={{ backgroundColor: statusColor.bg, color: statusColor.text, fontWeight: 600, borderRadius: '6px' }}
+                />
+              </DialogTitle>
+              <DialogContent sx={{ pt: 3 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2, borderRadius: '8px', backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#f9fafb', border: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'}` }}>
                     <AccessTime sx={{ color: '#00B4B4' }} />
                     <Box>
-                      <Typography variant="caption" sx={{ color: '#666' }}>Date & Time</Typography>
-                      <Typography variant="body1">{formatDateTime(selectedRide.date)}</Typography>
+                      <Typography variant="caption" sx={{ color: theme.palette.text.secondary, textTransform: 'uppercase', fontWeight: 600 }}>Scheduled For</Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.text.primary }}>{formatDateTime(selectedRide.date)}</Typography>
                     </Box>
                   </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <DirectionsCar sx={{ color: '#00B4B4' }} />
+
+                  <Box sx={{ position: 'relative', ml: 2 }}>
+                    <Box sx={{ position: 'absolute', left: '11px', top: '24px', bottom: '24px', width: '2px', backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
+                    
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 4 }}>
+                      <Box sx={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: 'rgba(0, 180, 180, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 0.5, zIndex: 1 }}>
+                        <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#00B4B4' }} />
+                      </Box>
+                      <Box>
+                        <Typography variant="caption" sx={{ color: theme.palette.text.secondary, textTransform: 'uppercase', fontWeight: 600 }}>Pickup Location</Typography>
+                        <Typography variant="body1" sx={{ fontWeight: 500, color: theme.palette.text.primary }}>{selectedRide.pickup}</Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                      <Box sx={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: 'rgba(236, 72, 153, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 0.5, zIndex: 1 }}>
+                        <LocationOn sx={{ color: '#ec4899', fontSize: 16 }} />
+                      </Box>
+                      <Box>
+                        <Typography variant="caption" sx={{ color: theme.palette.text.secondary, textTransform: 'uppercase', fontWeight: 600 }}>Dropoff Location</Typography>
+                        <Typography variant="body1" sx={{ fontWeight: 500, color: theme.palette.text.primary }}>{selectedRide.destination}</Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+
+                  <Divider sx={{ borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)' }} />
+                  
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Box>
-                      <Typography variant="caption" sx={{ color: '#666' }}>Vehicle</Typography>
-                      <Typography variant="body1">{selectedRide.vehicle || 'Not assigned'}</Typography>
+                      <Typography variant="caption" sx={{ color: theme.palette.text.secondary, textTransform: 'uppercase', fontWeight: 600 }}>Vehicle</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 500, color: theme.palette.text.primary }}>{selectedRide.vehicle || 'Pending assignment'}</Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" sx={{ color: theme.palette.text.secondary, textTransform: 'uppercase', fontWeight: 600 }}>Driver</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 500, color: theme.palette.text.primary }}>{selectedRide.driver || 'Pending assignment'}</Typography>
                     </Box>
                   </Box>
-                  <Chip
-                    label={formatRideStatus(selectedRide.status)}
-                    sx={{
-                      background: `${getStatusColor(selectedRide.status)}20`,
-                      color: getStatusColor(selectedRide.status),
-                      fontWeight: 600,
-                      alignSelf: 'flex-start',
-                    }}
-                  />
+
                 </Box>
               </DialogContent>
-              <DialogActions>
-                {selectedRide.status === 'pending' && (
+              <DialogActions sx={{ p: 3, pt: 1, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>
+                {(selectedRide.status === 'pending' || selectedRide.status === 'upcoming') && (
                   <Button
+                    variant="outlined"
                     startIcon={<Cancel />}
                     onClick={() => handleCancelRide(selectedRide._id)}
-                    sx={{ color: '#ff5252', mr: 'auto' }}
+                    sx={{ color: '#d32f2f', borderColor: 'rgba(211, 47, 47, 0.5)', mr: 'auto', borderRadius: '8px', textTransform: 'none', fontWeight: 600 }}
                   >
                     Cancel Ride
                   </Button>
                 )}
                 {selectedRide.status === 'completed' && (
                   <Button
+                    variant="outlined"
                     startIcon={<RateReview />}
-                    sx={{ color: '#00B4B4', mr: 'auto' }}
+                    sx={{ color: '#00B4B4', borderColor: 'rgba(0, 180, 180, 0.5)', mr: 'auto', borderRadius: '8px', textTransform: 'none', fontWeight: 600 }}
                   >
-                    Rate Ride
+                    Leave Review
                   </Button>
                 )}
-                <Button onClick={() => setDetailsOpen(false)}>Close</Button>
+                <Button onClick={() => setDetailsOpen(false)} sx={{ color: theme.palette.text.secondary, fontWeight: 600, textTransform: 'none' }}>Close</Button>
               </DialogActions>
             </>
-          )}
-        </Dialog>
-      </Box>
-    </>
+          )
+        })()}
+      </Dialog>
+      
+      <Footer />
+    </Box>
   )
 }
 

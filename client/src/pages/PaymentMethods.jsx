@@ -45,6 +45,9 @@ import {
   LocalOffer
 } from '@mui/icons-material'
 
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
+
 const PaymentMethods = () => {
   const [paymentMethods, setPaymentMethods] = useState([
     {
@@ -298,385 +301,391 @@ const PaymentMethods = () => {
   }
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom fontWeight="bold">
-        Payment Methods
-      </Typography>
-
-      <Alert severity="info" sx={{ mb: 3 }}>
-        <Typography variant="body2">
-          Manage your payment methods for seamless ride bookings. All payment information is encrypted and secure.
-        </Typography>
-      </Alert>
-
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-            <Typography variant="h6">Saved Payment Methods</Typography>
-            <Button
-              variant="contained"
-              startIcon={<Add />}
-              onClick={handleAddPaymentMethod}
-            >
-              Add Payment Method
-            </Button>
-          </Box>
-
-          {paymentMethods.length === 0 ? (
-            <Box textAlign="center" py={4}>
-              <CreditCard sx={{ fontSize: 64, color: 'action.disabled', mb: 2 }} />
-              <Typography variant="h6" color="text.secondary" gutterBottom>
-                No payment methods saved
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Add a payment method to start booking rides
-              </Typography>
-            </Box>
-          ) : (
-            <List>
-              {paymentMethods.map((method) => (
-                <Card key={method.id} variant="outlined" sx={{ mb: 2 }}>
-                  <CardContent>
-                    <Box display="flex" alignItems="center" justifyContent="space-between">
-                      <Box display="flex" alignItems="center">
-                        <Avatar sx={{ bgcolor: 'primary.main', mr: 2 }}>
-                          {getPaymentIcon(method.type)}
-                        </Avatar>
-                        <Box>
-                          <Box display="flex" alignItems="center" gap={1}>
-                            <Typography variant="h6">
-                              {getPaymentDisplay(method)}
-                            </Typography>
-                            {method.isDefault && (
-                              <Chip label="Default" color="primary" size="small" />
-                            )}
-                            {method.isVerified && (
-                              <Chip 
-                                label="Verified" 
-                                color="success" 
-                                size="small"
-                                icon={<CheckCircle />}
-                              />
-                            )}
-                          </Box>
-                          {method.type === 'credit' || method.type === 'debit' ? (
-                            <Typography variant="body2" color="text.secondary">
-                              Expires {method.expiryMonth}/{method.expiryYear}
-                            </Typography>
-                          ) : null}
-                        </Box>
-                      </Box>
-                      
-                      <Box display="flex" alignItems="center" gap={1}>
-                        {!method.isDefault && (
-                          <Button
-                            variant="text"
-                            size="small"
-                            onClick={() => handleSetDefault(method.id)}
-                          >
-                            Set as Default
-                          </Button>
-                        )}
-                        <IconButton size="small" onClick={() => handleEditPaymentMethod(method)}>
-                          <Edit />
-                        </IconButton>
-                        <IconButton 
-                          size="small" 
-                          onClick={() => handleDeletePaymentMethod(method)}
-                          disabled={paymentMethods.length === 1}
-                        >
-                          <Delete />
-                        </IconButton>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
-              ))}
-            </List>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Security Tips */}
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>Security Tips</Typography>
-          <List dense>
-            <ListItem>
-              <ListItemIcon>
-                <Security color="primary" />
-              </ListItemIcon>
-              <ListItemText 
-                primary="End-to-end encryption"
-                secondary="All payment data is encrypted and securely stored"
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemIcon>
-                <CheckCircle color="success" />
-              </ListItemIcon>
-              <ListItemText 
-                primary="PCI DSS compliant"
-                secondary="We meet the highest security standards for payment processing"
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemIcon>
-                <Warning color="warning" />
-              </ListItemIcon>
-              <ListItemText 
-                primary="Fraud detection"
-                secondary="Advanced fraud detection systems protect your account"
-              />
-            </ListItem>
-          </List>
-        </CardContent>
-      </Card>
-
-      {/* Add/Edit Payment Method Dialog */}
-      <Dialog open={showAddDialog} onClose={() => setShowAddDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          {selectedMethod ? 'Edit Payment Method' : 'Add Payment Method'}
-        </DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Payment Type</InputLabel>
-                <Select
-                  value={newPaymentMethod.type}
-                  label="Payment Type"
-                  onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, type: e.target.value }))}
-                  disabled={!!selectedMethod}
-                >
-                  {paymentTypes.map(type => (
-                    <MenuItem key={type.value} value={type.value}>
-                      <Box display="flex" alignItems="center">
-                        {type.icon}
-                        <Typography sx={{ ml: 1 }}>{type.label}</Typography>
-                      </Box>
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            {(newPaymentMethod.type === 'credit' || newPaymentMethod.type === 'debit') && (
-              <>
-                <Grid item xs={12}>
-                  <FormControl fullWidth>
-                    <InputLabel>Card Brand</InputLabel>
-                    <Select
-                      value={newPaymentMethod.brand}
-                      label="Card Brand"
-                      onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, brand: e.target.value }))}
-                    >
-                      {cardBrands.map(brand => (
-                        <MenuItem key={brand.value} value={brand.value}>
-                          {brand.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Card Number"
-                    value={formatCardNumber(newPaymentMethod.cardNumber)}
-                    onChange={(e) => setNewPaymentMethod(prev => ({ 
-                      ...prev, 
-                      cardNumber: e.target.value.replace(/\D/g, '').slice(0, 16)
-                    }))}
-                    error={!!errors.cardNumber}
-                    helperText={errors.cardNumber}
-                    placeholder="1234 5678 9012 3456"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    label="Expiry Month"
-                    value={newPaymentMethod.expiryMonth}
-                    onChange={(e) => setNewPaymentMethod(prev => ({ 
-                      ...prev, 
-                      expiryMonth: e.target.value.replace(/\D/g, '').slice(0, 2)
-                    }))}
-                    error={!!errors.expiryMonth}
-                    helperText={errors.expiryMonth}
-                    placeholder="MM"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    label="Expiry Year"
-                    value={newPaymentMethod.expiryYear}
-                    onChange={(e) => setNewPaymentMethod(prev => ({ 
-                      ...prev, 
-                      expiryYear: e.target.value.replace(/\D/g, '').slice(0, 4)
-                    }))}
-                    error={!!errors.expiryYear}
-                    helperText={errors.expiryYear}
-                    placeholder="YYYY"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="CVV"
-                    type={showCvv ? 'text' : 'password'}
-                    value={newPaymentMethod.cvv}
-                    onChange={(e) => setNewPaymentMethod(prev => ({ 
-                      ...prev, 
-                      cvv: e.target.value.replace(/\D/g, '').slice(0, 4)
-                    }))}
-                    error={!!errors.cvv}
-                    helperText={errors.cvv}
-                    InputProps={{
-                      endAdornment: (
-                        <IconButton onClick={() => setShowCvv(!showCvv)}>
-                          {showCvv ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      )
-                    }}
-                  />
-                </Grid>
-              </>
-            )}
-
-            {newPaymentMethod.type === 'bank' && (
-              <>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Bank Name"
-                    value={newPaymentMethod.bankName}
-                    onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, bankName: e.target.value }))}
-                    error={!!errors.bankName}
-                    helperText={errors.bankName}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControl fullWidth>
-                    <InputLabel>Account Type</InputLabel>
-                    <Select
-                      value={newPaymentMethod.accountType}
-                      label="Account Type"
-                      onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, accountType: e.target.value }))}
-                    >
-                      <MenuItem value="checking">Checking</MenuItem>
-                      <MenuItem value="savings">Savings</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Routing Number"
-                    value={newPaymentMethod.routingNumber}
-                    onChange={(e) => setNewPaymentMethod(prev => ({ 
-                      ...prev, 
-                      routingNumber: e.target.value.replace(/\D/g, '')
-                    }))}
-                    error={!!errors.routingNumber}
-                    helperText={errors.routingNumber}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Account Number"
-                    value={newPaymentMethod.accountNumber}
-                    onChange={(e) => setNewPaymentMethod(prev => ({ 
-                      ...prev, 
-                      accountNumber: e.target.value.replace(/\D/g, '')
-                    }))}
-                    error={!!errors.accountNumber}
-                    helperText={errors.accountNumber}
-                  />
-                </Grid>
-              </>
-            )}
-
-            {newPaymentMethod.type === 'wallet' && (
-              <>
-                <Grid item xs={12}>
-                  <FormControl fullWidth>
-                    <InputLabel>Wallet Provider</InputLabel>
-                    <Select
-                      value={newPaymentMethod.brand}
-                      label="Wallet Provider"
-                      onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, brand: e.target.value }))}
-                    >
-                      {walletProviders.map(provider => (
-                        <MenuItem key={provider.value} value={provider.value}>
-                          {provider.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    type="email"
-                    label="Email"
-                    value={newPaymentMethod.email}
-                    onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, email: e.target.value }))}
-                    error={!!errors.email}
-                    helperText={errors.email}
-                  />
-                </Grid>
-              </>
-            )}
-
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Cardholder Name"
-                value={newPaymentMethod.holderName}
-                onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, holderName: e.target.value }))}
-                error={!!errors.holderName}
-                helperText={errors.holderName}
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowAddDialog(false)}>Cancel</Button>
-          <Button 
-            onClick={handleSavePaymentMethod} 
-            variant="contained"
-            disabled={loading}
-            startIcon={loading ? null : <CheckCircle />}
-          >
-            {loading ? 'Saving...' : 'Save Payment Method'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteDialog} onClose={() => setShowDeleteDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Delete Payment Method</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2">
-            Are you sure you want to delete this payment method? This action cannot be undone.
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Navbar />
+      <Box component="main" sx={{ flexGrow: 1, pt: '80px', pb: 4 }}>
+        <Container maxWidth="md">
+          <Typography variant="h4" gutterBottom fontWeight="bold">
+            Payment Methods
           </Typography>
-          {selectedMethod && (
-            <Typography variant="body2" sx={{ mt: 2, fontWeight: 'medium' }}>
-              {getPaymentDisplay(selectedMethod)}
+
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <Typography variant="body2">
+              Manage your payment methods for seamless ride bookings. All payment information is encrypted and secure.
             </Typography>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
-          <Button onClick={confirmDeletePaymentMethod} color="error" variant="contained">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+          </Alert>
+
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                <Typography variant="h6">Saved Payment Methods</Typography>
+                <Button
+                  variant="contained"
+                  startIcon={<Add />}
+                  onClick={handleAddPaymentMethod}
+                >
+                  Add Payment Method
+                </Button>
+              </Box>
+
+              {paymentMethods.length === 0 ? (
+                <Box textAlign="center" py={4}>
+                  <CreditCard sx={{ fontSize: 64, color: 'action.disabled', mb: 2 }} />
+                  <Typography variant="h6" color="text.secondary" gutterBottom>
+                    No payment methods saved
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Add a payment method to start booking rides
+                  </Typography>
+                </Box>
+              ) : (
+                <List>
+                  {paymentMethods.map((method) => (
+                    <Card key={method.id} variant="outlined" sx={{ mb: 2 }}>
+                      <CardContent>
+                        <Box display="flex" alignItems="center" justifyContent="space-between">
+                          <Box display="flex" alignItems="center">
+                            <Avatar sx={{ bgcolor: 'primary.main', mr: 2 }}>
+                              {getPaymentIcon(method.type)}
+                            </Avatar>
+                            <Box>
+                              <Box display="flex" alignItems="center" gap={1}>
+                                <Typography variant="h6">
+                                  {getPaymentDisplay(method)}
+                                </Typography>
+                                {method.isDefault && (
+                                  <Chip label="Default" color="primary" size="small" />
+                                )}
+                                {method.isVerified && (
+                                  <Chip 
+                                    label="Verified" 
+                                    color="success" 
+                                    size="small"
+                                    icon={<CheckCircle />}
+                                  />
+                                )}
+                              </Box>
+                              {method.type === 'credit' || method.type === 'debit' ? (
+                                <Typography variant="body2" color="text.secondary">
+                                  Expires {method.expiryMonth}/{method.expiryYear}
+                                </Typography>
+                              ) : null}
+                            </Box>
+                          </Box>
+                          
+                          <Box display="flex" alignItems="center" gap={1}>
+                            {!method.isDefault && (
+                              <Button
+                                variant="text"
+                                size="small"
+                                onClick={() => handleSetDefault(method.id)}
+                              >
+                                Set as Default
+                              </Button>
+                            )}
+                            <IconButton size="small" onClick={() => handleEditPaymentMethod(method)}>
+                              <Edit />
+                            </IconButton>
+                            <IconButton 
+                              size="small" 
+                              onClick={() => handleDeletePaymentMethod(method)}
+                              disabled={paymentMethods.length === 1}
+                            >
+                              <Delete />
+                            </IconButton>
+                          </Box>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </List>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Security Tips */}
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>Security Tips</Typography>
+              <List dense>
+                <ListItem>
+                  <ListItemIcon>
+                    <Security color="primary" />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="End-to-end encryption"
+                    secondary="All payment data is encrypted and securely stored"
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon>
+                    <CheckCircle color="success" />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="PCI DSS compliant"
+                    secondary="We meet the highest security standards for payment processing"
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon>
+                    <Warning color="warning" />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="Fraud detection"
+                    secondary="Advanced fraud detection systems protect your account"
+                  />
+                </ListItem>
+              </List>
+            </CardContent>
+          </Card>
+
+          {/* Add/Edit Payment Method Dialog */}
+          <Dialog open={showAddDialog} onClose={() => setShowAddDialog(false)} maxWidth="sm" fullWidth>
+            <DialogTitle>
+              {selectedMethod ? 'Edit Payment Method' : 'Add Payment Method'}
+            </DialogTitle>
+            <DialogContent>
+              <Grid container spacing={2} sx={{ mt: 1 }}>
+                <Grid item xs={12}>
+                  <FormControl fullWidth>
+                    <InputLabel>Payment Type</InputLabel>
+                    <Select
+                      value={newPaymentMethod.type}
+                      label="Payment Type"
+                      onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, type: e.target.value }))}
+                      disabled={!!selectedMethod}
+                    >
+                      {paymentTypes.map(type => (
+                        <MenuItem key={type.value} value={type.value}>
+                          <Box display="flex" alignItems="center">
+                            {type.icon}
+                            <Typography sx={{ ml: 1 }}>{type.label}</Typography>
+                          </Box>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                {(newPaymentMethod.type === 'credit' || newPaymentMethod.type === 'debit') && (
+                  <>
+                    <Grid item xs={12}>
+                      <FormControl fullWidth>
+                        <InputLabel>Card Brand</InputLabel>
+                        <Select
+                          value={newPaymentMethod.brand}
+                          label="Card Brand"
+                          onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, brand: e.target.value }))}
+                        >
+                          {cardBrands.map(brand => (
+                            <MenuItem key={brand.value} value={brand.value}>
+                              {brand.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Card Number"
+                        value={formatCardNumber(newPaymentMethod.cardNumber)}
+                        onChange={(e) => setNewPaymentMethod(prev => ({ 
+                          ...prev, 
+                          cardNumber: e.target.value.replace(/\D/g, '').slice(0, 16)
+                        }))}
+                        error={!!errors.cardNumber}
+                        helperText={errors.cardNumber}
+                        placeholder="1234 5678 9012 3456"
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        label="Expiry Month"
+                        value={newPaymentMethod.expiryMonth}
+                        onChange={(e) => setNewPaymentMethod(prev => ({ 
+                          ...prev, 
+                          expiryMonth: e.target.value.replace(/\D/g, '').slice(0, 2)
+                        }))}
+                        error={!!errors.expiryMonth}
+                        helperText={errors.expiryMonth}
+                        placeholder="MM"
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        label="Expiry Year"
+                        value={newPaymentMethod.expiryYear}
+                        onChange={(e) => setNewPaymentMethod(prev => ({ 
+                          ...prev, 
+                          expiryYear: e.target.value.replace(/\D/g, '').slice(0, 4)
+                        }))}
+                        error={!!errors.expiryYear}
+                        helperText={errors.expiryYear}
+                        placeholder="YYYY"
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="CVV"
+                        type={showCvv ? 'text' : 'password'}
+                        value={newPaymentMethod.cvv}
+                        onChange={(e) => setNewPaymentMethod(prev => ({ 
+                          ...prev, 
+                          cvv: e.target.value.replace(/\D/g, '').slice(0, 4)
+                        }))}
+                        error={!!errors.cvv}
+                        helperText={errors.cvv}
+                        InputProps={{
+                          endAdornment: (
+                            <IconButton onClick={() => setShowCvv(!showCvv)}>
+                              {showCvv ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          )
+                        }}
+                      />
+                    </Grid>
+                  </>
+                )}
+
+                {newPaymentMethod.type === 'bank' && (
+                  <>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Bank Name"
+                        value={newPaymentMethod.bankName}
+                        onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, bankName: e.target.value }))}
+                        error={!!errors.bankName}
+                        helperText={errors.bankName}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FormControl fullWidth>
+                        <InputLabel>Account Type</InputLabel>
+                        <Select
+                          value={newPaymentMethod.accountType}
+                          label="Account Type"
+                          onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, accountType: e.target.value }))}
+                        >
+                          <MenuItem value="checking">Checking</MenuItem>
+                          <MenuItem value="savings">Savings</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Routing Number"
+                        value={newPaymentMethod.routingNumber}
+                        onChange={(e) => setNewPaymentMethod(prev => ({ 
+                          ...prev, 
+                          routingNumber: e.target.value.replace(/\D/g, '')
+                        }))}
+                        error={!!errors.routingNumber}
+                        helperText={errors.routingNumber}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Account Number"
+                        value={newPaymentMethod.accountNumber}
+                        onChange={(e) => setNewPaymentMethod(prev => ({ 
+                          ...prev, 
+                          accountNumber: e.target.value.replace(/\D/g, '')
+                        }))}
+                        error={!!errors.accountNumber}
+                        helperText={errors.accountNumber}
+                      />
+                    </Grid>
+                  </>
+                )}
+
+                {newPaymentMethod.type === 'wallet' && (
+                  <>
+                    <Grid item xs={12}>
+                      <FormControl fullWidth>
+                        <InputLabel>Wallet Provider</InputLabel>
+                        <Select
+                          value={newPaymentMethod.brand}
+                          label="Wallet Provider"
+                          onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, brand: e.target.value }))}
+                        >
+                          {walletProviders.map(provider => (
+                            <MenuItem key={provider.value} value={provider.value}>
+                              {provider.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        type="email"
+                        label="Email"
+                        value={newPaymentMethod.email}
+                        onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, email: e.target.value }))}
+                        error={!!errors.email}
+                        helperText={errors.email}
+                      />
+                    </Grid>
+                  </>
+                )}
+
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Cardholder Name"
+                    value={newPaymentMethod.holderName}
+                    onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, holderName: e.target.value }))}
+                    error={!!errors.holderName}
+                    helperText={errors.holderName}
+                  />
+                </Grid>
+              </Grid>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setShowAddDialog(false)}>Cancel</Button>
+              <Button 
+                onClick={handleSavePaymentMethod} 
+                variant="contained"
+                disabled={loading}
+                startIcon={loading ? null : <CheckCircle />}
+              >
+                {loading ? 'Saving...' : 'Save Payment Method'}
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          {/* Delete Confirmation Dialog */}
+          <Dialog open={showDeleteDialog} onClose={() => setShowDeleteDialog(false)} maxWidth="sm" fullWidth>
+            <DialogTitle>Delete Payment Method</DialogTitle>
+            <DialogContent>
+              <Typography variant="body2">
+                Are you sure you want to delete this payment method? This action cannot be undone.
+              </Typography>
+              {selectedMethod && (
+                <Typography variant="body2" sx={{ mt: 2, fontWeight: 'medium' }}>
+                  {getPaymentDisplay(selectedMethod)}
+                </Typography>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
+              <Button onClick={confirmDeletePaymentMethod} color="error" variant="contained">
+                Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Container>
+      </Box>
+      <Footer />
+    </Box>
   )
 }
 

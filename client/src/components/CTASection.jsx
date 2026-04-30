@@ -86,7 +86,7 @@ const CTASection = () => {
           </Typography>
           <Button
             component={RouterLink}
-            to={isAuthenticated ? '/dashboard' : '/register'}
+            to={isAuthenticated ? '/dashboard' : '/login'}
             variant="contained"
             size="large"
             sx={{

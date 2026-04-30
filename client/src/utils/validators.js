@@ -77,19 +77,7 @@ export const validationSchemas = {
     email: validateEmail,
     password: (value) => validateRequired(value, 'Password'),
   },
-  register: {
-    name: validateName,
-    email: validateEmail,
-    phone: validatePhone,
-    password: validatePassword,
-    confirmPassword: (value, password) => {
-      if (!value) return 'Please confirm your password'
-      if (value !== password) return 'Passwords do not match'
-      return null
-    },
-    company: validateCompany,
-    employeeId: validateEmployeeId,
-  },
+
   booking: {
     pickupLocation: validatePickupLocation,
     destination: validateDestination,

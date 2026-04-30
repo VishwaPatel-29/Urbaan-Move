@@ -105,7 +105,7 @@ const DriverDashboard = () => {
 
   if (loading) {
     return (
-      <Box sx={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <LottieLoader height={100} width={100} />
       </Box>
     )

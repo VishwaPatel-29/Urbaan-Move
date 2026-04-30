@@ -107,7 +107,6 @@ export const darkTheme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          background: '#1a1a1a',
           borderRadius: 16,
           border: '1px solid #333',
           transition: 'all 0.3s ease',
@@ -122,7 +121,6 @@ export const darkTheme = createTheme({
         root: {
           '& .MuiOutlinedInput-root': {
             borderRadius: 12,
-            backgroundColor: '#0a0a0a',
             '& fieldset': {
               borderColor: '#333',
             },
@@ -146,7 +144,6 @@ export const darkTheme = createTheme({
     MuiDialog: {
       styleOverrides: {
         paper: {
-          background: '#1a1a1a',
           border: '1px solid #333',
           borderRadius: 16,
         },
@@ -164,7 +161,6 @@ export const darkTheme = createTheme({
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          background: '#0a0a0a',
           borderRight: '1px solid #333',
         },
       },
@@ -217,8 +213,6 @@ export const lightTheme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          background: '#ffffff',
-          borderRadius: 16,
           boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
           '&:hover': {
             boxShadow: '0 6px 24px rgba(0,128,128,0.15)',
@@ -230,8 +224,6 @@ export const lightTheme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            backgroundColor: '#ffffff',
-            borderRadius: 12,
             '& fieldset': {
               borderColor: '#ddd',
             },

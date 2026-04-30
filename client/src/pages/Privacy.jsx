@@ -117,7 +117,7 @@ const Privacy = () => {
         <meta name="description" content="UrbanMove Privacy Policy" />
       </Helmet>
 
-      <Box sx={{ minHeight: '100vh', background: '#000' }}>
+      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
         <Navbar />
 
         <Container maxWidth="lg" sx={{ py: 8 }}>

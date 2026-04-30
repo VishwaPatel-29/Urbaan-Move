@@ -2,40 +2,59 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://urbanmove-server.up.railway.app/api'
 
 // API headers configuration
-const getHeaders = () => {
+const getHeaders = (options = {}) => {
   const token = localStorage.getItem('urbanmove-token')
-  return {
+  const defaultHeaders = {
     'Content-Type': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` }),
   }
+  return { ...defaultHeaders, ...options.headers }
 }
 
-// Generic API request handler
-const apiRequest = async (endpoint, options = {}) => {
+/**
+ * Generic API request handler with retry logic and interceptor-like behavior
+ */
+const apiRequest = async (endpoint, options = {}, retries = 3, backoff = 1000) => {
   // Always use mock responses for now since backend isn't deployed
-  console.log('Using mock response for:', endpoint)
-  return getMockResponse(endpoint, options)
-
-  try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...options,
-      headers: {
-        ...getHeaders(),
-        ...options.headers,
-      },
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
-    }
-
-    return await response.json()
-  } catch (error) {
-    console.error('API request failed:', error)
-    // Always return mock response on error for now
-    console.warn('Using mock response due to API failure')
+  // This allows us to test the UI flow without a live server
+  if (import.meta.env.MODE === 'development' || !import.meta.env.VITE_API_URL) {
+    console.log('Using mock response for:', endpoint)
     return getMockResponse(endpoint, options)
+  }
+
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        ...options,
+        headers: getHeaders(options),
+      })
+
+      // Response Interceptor Logic
+      if (!response.ok) {
+        // Handle 401 Unauthorized (Token expired)
+        if (response.status === 401) {
+          console.warn('Unauthorized request. Token might be expired.')
+          // In a real app, you might trigger a logout or token refresh here
+        }
+
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      const isLastAttempt = attempt === retries - 1
+      if (isLastAttempt) {
+        console.error(`API request failed after ${retries} attempts:`, error)
+        // Fallback to mock on final failure in development/demo modes
+        console.warn('Falling back to mock response after total failure')
+        return getMockResponse(endpoint, options)
+      }
+
+      console.warn(`API attempt ${attempt + 1} failed. Retrying in ${backoff}ms...`)
+      await new Promise((resolve) => setTimeout(resolve, backoff))
+      backoff *= 2 // Exponential backoff
+    }
   }
 }
 
@@ -54,22 +73,22 @@ const getMockResponse = (endpoint, options) => {
   const mockResponses = {
     '/auth/login': (options) => {
       try {
-        // Parse the request body to get the actual credentials
         const requestBody = options.body ? JSON.parse(options.body) : {}
         const email = requestBody.email || 'demo@urbanmove.com'
-        const name = requestBody.name || 'Demo User'
         const role = requestBody.role || 'employee'
+        const name = requestBody.name || generateUserName(email, role)
         
         return {
           success: true,
           data: {
             user: {
               id: '1',
-              name: name, // Use the actual name from the login form
+              name: name,
               email: email,
               role: role,
               phone: '+1234567890',
               company: 'TechCorp Inc.',
+              avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00B4B4&color=fff`
             },
             token: 'mock-jwt-token-123456789'
           },
@@ -83,69 +102,34 @@ const getMockResponse = (endpoint, options) => {
         }
       }
     },
-    '/auth/register': (options) => {
+
+    '/auth/google-login': (options) => {
       try {
-        // Parse the request body to get the actual user data
         const requestBody = options.body ? JSON.parse(options.body) : {}
-        const name = requestBody.name || 'New User'
-        const email = requestBody.email || 'user@urbanmove.com'
-        const phone = requestBody.phone || '+1234567890'
-        const company = requestBody.company || 'InnovateTech'
+        const name = requestBody.name || 'Google User'
+        const email = requestBody.email || 'google@urbanmove.com'
         
         return {
           success: true,
           data: {
             user: {
-              id: '2',
-              name: name, // Use the actual name from registration form
+              id: '3',
+              name: name,
               email: email,
               role: 'employee',
-              phone: phone,
-              company: company,
-              employeeId: requestBody.employeeId || 'EMP001'
+              phone: '+1234567890',
+              company: 'Google Corp',
+              avatar: requestBody.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00B4B4&color=fff`
             },
-            token: 'mock-jwt-token-987654321'
+            token: 'mock-google-jwt-token'
           },
-          message: 'Registration successful'
+          message: 'Google login successful'
         }
       } catch (error) {
-        console.error('Mock API registration error:', error)
-        return {
-          success: false,
-          message: 'Registration failed'
-        }
+        return { success: false, message: 'Google login failed' }
       }
     },
-    '/auth/google-login': {
-      success: true,
-      data: {
-        user: {
-          id: '3',
-          name: 'Google User',
-          email: 'google@urbanmove.com',
-          role: 'user',
-          phone: '+1234567890',
-          company: 'Google Corp',
-        },
-        token: 'mock-google-jwt-token'
-      },
-      message: 'Google login successful'
-    },
-    '/auth/google-register': {
-      success: true,
-      data: {
-        user: {
-          id: '4',
-          name: 'Google User',
-          email: 'google@urbanmove.com',
-          role: 'user',
-          phone: '+1234567890',
-          company: 'Google Corp',
-        },
-        token: 'mock-google-jwt-token-register'
-      },
-      message: 'Google registration successful'
-    },
+
     '/auth/refresh': {
       success: true,
       data: {
@@ -180,26 +164,16 @@ export const authService = {
     })
   },
 
-  register: async (userData) => {
-    return apiRequest('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(userData),
-    })
-  },
 
-  googleLogin: async (token) => {
+
+  googleLogin: async (data) => {
     return apiRequest('/auth/google-login', {
       method: 'POST',
-      body: JSON.stringify({ token }),
+      body: JSON.stringify(data),
     })
   },
 
-  googleRegister: async (token) => {
-    return apiRequest('/auth/google-register', {
-      method: 'POST',
-      body: JSON.stringify({ token }),
-    })
-  },
+
 
   logout: async () => {
     return apiRequest('/auth/logout', {
@@ -382,41 +356,55 @@ export const paymentService = {
 
 // Admin service
 export const adminService = {
-  getDashboardStats: async () => {
-    return apiRequest('/admin/dashboard')
+  getStats: async () => {
+    return apiRequest('/admin/stats')
   },
 
-  getAllUsers: async (page = 1, limit = 10) => {
-    return apiRequest(`/admin/users?page=${page}&limit=${limit}`)
+  getUsers: async (params = {}) => {
+    const searchParams = new URLSearchParams(params)
+    return apiRequest(`/admin/users?${searchParams}`)
   },
 
+  getUser: async (id) => {
+    return apiRequest(`/admin/users/${id}`)
+  },
+
+  createUser: async (userData) => {
+    return apiRequest('/admin/users', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    })
+  },
+
+  updateUser: async (id, userData) => {
+    return apiRequest(`/admin/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData),
+    })
+  },
+
+  deleteUser: async (id) => {
+    return apiRequest(`/admin/users/${id}`, {
+      method: 'DELETE',
+    })
+  },
+
+  // Keep these for backward compatibility if needed elsewhere
+  getDashboardStats: async () => adminService.getStats(),
+  getAllUsers: async (page = 1, limit = 10) => adminService.getUsers({ page, limit }),
   getAllRides: async (page = 1, limit = 10, filters = {}) => {
     const params = new URLSearchParams({ page, limit, ...filters })
     return apiRequest(`/admin/rides?${params}`)
   },
-
-  getAllShuttles: async () => {
-    return apiRequest('/admin/shuttles')
-  },
-
+  getAllShuttles: async () => apiRequest('/admin/shuttles'),
   updateUserRole: async (userId, role) => {
     return apiRequest(`/admin/users/${userId}/role`, {
       method: 'PUT',
       body: JSON.stringify({ role }),
     })
   },
-
-  banUser: async (userId) => {
-    return apiRequest(`/admin/users/${userId}/ban`, {
-      method: 'PUT',
-    })
-  },
-
-  unbanUser: async (userId) => {
-    return apiRequest(`/admin/users/${userId}/unban`, {
-      method: 'PUT',
-    })
-  },
+  banUser: async (userId) => apiRequest(`/admin/users/${userId}/ban`, { method: 'PUT' }),
+  unbanUser: async (userId) => apiRequest(`/admin/users/${userId}/unban`, { method: 'PUT' }),
 }
 
 // Export default API service

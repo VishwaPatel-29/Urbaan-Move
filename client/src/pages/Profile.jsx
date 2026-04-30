@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
-import { motion } from 'framer-motion'
 import {
   Box,
   Typography,
@@ -14,8 +13,9 @@ import {
   Divider,
   Switch,
   FormControlLabel,
-  Alert,
   CircularProgress,
+  useTheme as useMuiTheme,
+  Container
 } from '@mui/material'
 import {
   PhotoCamera,
@@ -24,29 +24,33 @@ import {
   Notifications,
   History,
   Edit,
+  Badge,
+  Business,
+  Phone,
+  Email,
+  Person
 } from '@mui/icons-material'
 import { useSelector, useDispatch } from 'react-redux'
 import toast from 'react-hot-toast'
-import { selectTheme } from '../features/uiSlice'
 import { selectUser, setUser } from '../features/authSlice'
-import { userService } from '../services/api'
-import { uploadToCloudinary } from '../services/cloudinary'
 import { validateName, validatePhone } from '../utils/validators'
 import Navbar from '../components/Navbar'
-import Sidebar from '../components/Sidebar'
+import Footer from '../components/Footer'
 
 const Profile = () => {
   const dispatch = useDispatch()
-  const theme = useSelector(selectTheme)
+  const theme = useMuiTheme()
+  const isDark = theme.palette.mode === 'dark'
   const user = useSelector(selectUser)
   
   const [loading, setLoading] = useState(false)
   const [editing, setEditing] = useState(false)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null)
   const [formData, setFormData] = useState({
-    name: user?.name || '',
-    phone: user?.phone || '',
-    company: user?.company || '',
+    name: user?.name || 'Jane Doe', // Mock fallback
+    phone: user?.phone || '+1 (555) 123-4567',
+    company: user?.company || 'Acme Corp',
   })
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -94,19 +98,31 @@ const Profile = () => {
     if (!file) return
 
     setUploadingAvatar(true)
-    try {
-      const result = await uploadToCloudinary(file, 'avatars')
-      if (result.success) {
-        dispatch(setUser({ ...user, avatar: result.url }))
-        toast.success('Avatar updated!')
-      } else {
-        toast.error('Failed to upload avatar')
+    
+    // Instantly show the selected image in the UI
+    const objectUrl = URL.createObjectURL(file)
+    setAvatarPreview(objectUrl)
+    
+    // Read the file as a base64 string to save to Redux
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      const base64String = reader.result
+      
+      const updatedUser = user ? { ...user, avatar: base64String } : { 
+        name: formData.name, 
+        email: 'user@acmecorp.com', 
+        avatar: base64String 
       }
-    } catch (error) {
-      toast.error('Failed to upload avatar')
-    } finally {
+      
+      dispatch(setUser(updatedUser))
+      toast.success('Avatar updated successfully!')
       setUploadingAvatar(false)
     }
+    reader.onerror = () => {
+      toast.error('Failed to read image file')
+      setUploadingAvatar(false)
+    }
+    reader.readAsDataURL(file)
   }
 
   const handleNotificationChange = (type) => {
@@ -114,45 +130,52 @@ const Profile = () => {
     toast.success(`${type} notifications ${notifications[type] ? 'disabled' : 'enabled'}`)
   }
 
+  const cardStyle = {
+    borderRadius: '12px',
+    backgroundColor: theme.palette.background.paper,
+    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
+    boxShadow: 'none',
+  }
+
   return (
     <>
       <Helmet>
-        <title>Profile | UrbanMove</title>
-        <meta name="description" content="Manage your UrbanMove profile and preferences." />
+        <title>Profile | UrbanMove Enterprise</title>
       </Helmet>
 
-      <Box sx={{ minHeight: '100vh', background: theme === 'dark' ? '#000' : '#f5f5f5' }}>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: isDark ? '#0a0a0a' : '#f4f6f8' }}>
         <Navbar />
 
-        <Box sx={{ display: 'flex', pt: 8 }}>
-          <Sidebar open={true} />
+        <Box sx={{ flexGrow: 1, pt: { xs: '80px', md: '100px' }, pb: 8 }}>
+          <Container maxWidth="lg">
+            
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h4" sx={{ fontWeight: 800, color: theme.palette.text.primary, mb: 1, letterSpacing: '-0.5px' }}>
+                Account Settings
+              </Typography>
+              <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
+                Manage your profile, security preferences, and enterprise data.
+              </Typography>
+            </Box>
 
-          <Box
-            component={motion.main}
-            initial={{ opacity: 0, x: 200 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3 }}
-            sx={{ flex: 1, p: { xs: 2, md: 4 }, ml: 280 }}
-          >
-            <Typography variant="h4" sx={{ mb: 4, fontWeight: 700 }}>
-              My Profile
-            </Typography>
-
-            <Grid container spacing={3}>
+            <Grid container spacing={4}>
+              {/* Left Column: Avatar & Quick Links */}
               <Grid item xs={12} md={4}>
-                <Card sx={{ textAlign: 'center' }}>
-                  <CardContent sx={{ py: 4 }}>
+                <Card sx={{ ...cardStyle, mb: 4, textAlign: 'center' }}>
+                  <CardContent sx={{ p: 4 }}>
                     <Box sx={{ position: 'relative', display: 'inline-block', mb: 3 }}>
                       <Avatar
-                        src={user?.avatar}
+                        src={avatarPreview || user?.avatar}
                         sx={{
                           width: 120,
                           height: 120,
                           fontSize: 48,
-                          background: 'linear-gradient(135deg, #00B4B4 0%, #008080 100%)',
+                          bgcolor: '#00B4B4',
+                          color: '#fff',
+                          fontWeight: 700
                         }}
                       >
-                        {user?.name?.charAt(0) || 'U'}
+                        {user?.name?.charAt(0) || formData.name.charAt(0) || 'U'}
                       </Avatar>
                       <IconButton
                         component="label"
@@ -160,182 +183,243 @@ const Profile = () => {
                           position: 'absolute',
                           bottom: 0,
                           right: 0,
-                          background: '#00B4B4',
-                          '&:hover': { background: '#008080' },
+                          backgroundColor: theme.palette.background.paper,
+                          border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                          '&:hover': { backgroundColor: '#00B4B4', color: '#fff', '& svg': { color: '#fff' } },
+                          transition: 'all 0.2s',
                         }}
                       >
                         {uploadingAvatar ? (
-                          <CircularProgress size={20} color="inherit" />
+                          <CircularProgress size={20} sx={{ color: '#00B4B4' }} />
                         ) : (
-                          <PhotoCamera sx={{ color: '#fff' }} />
+                          <PhotoCamera sx={{ color: theme.palette.text.primary, fontSize: 20 }} />
                         )}
                         <input type="file" hidden accept="image/*" onChange={handleAvatarUpload} />
                       </IconButton>
                     </Box>
 
-                    <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                      {user?.name}
+                    <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.text.primary }}>
+                      {formData.name || user?.name || 'User Name'}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#666', mb: 2 }}>
-                      {user?.email}
+                    <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 3 }}>
+                      {user?.email || 'user@acmecorp.com'}
                     </Typography>
-                    <Divider sx={{ my: 2 }} />
+                    
+                    <Divider sx={{ mb: 3, borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)' }} />
+                    
                     <Button
-                      variant="outlined"
+                      fullWidth
+                      variant={editing ? "outlined" : "contained"}
                       startIcon={<Edit />}
                       onClick={() => setEditing(!editing)}
-                      sx={{ borderColor: '#00B4B4', color: '#00B4B4' }}
+                      sx={{
+                        py: 1.5,
+                        borderRadius: '8px',
+                        backgroundColor: editing ? 'transparent' : '#00B4B4',
+                        color: editing ? theme.palette.text.primary : '#fff',
+                        borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
+                        boxShadow: 'none',
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        '&:hover': {
+                          backgroundColor: editing ? 'rgba(0,0,0,0.05)' : '#008080',
+                          boxShadow: 'none',
+                        }
+                      }}
                     >
-                      {editing ? 'Cancel Edit' : 'Edit Profile'}
+                      {editing ? 'Cancel Editing' : 'Edit Profile'}
                     </Button>
                   </CardContent>
                 </Card>
 
-                <Card sx={{ mt: 3 }}>
-                  <CardContent>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                      Quick Links
+                <Card sx={cardStyle}>
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: theme.palette.text.secondary, textTransform: 'uppercase', letterSpacing: '0.5px', mb: 2 }}>
+                      System Links
                     </Typography>
                     <Button
                       fullWidth
                       startIcon={<History />}
-                      sx={{ justifyContent: 'flex-start', color: '#666', mb: 1 }}
+                      sx={{ justifyContent: 'flex-start', color: theme.palette.text.primary, py: 1.5, textTransform: 'none', fontWeight: 500 }}
                     >
-                      Ride History
+                      Commute History
                     </Button>
                     <Button
                       fullWidth
-                      startIcon={<Notifications />}
-                      sx={{ justifyContent: 'flex-start', color: '#666' }}
+                      startIcon={<Business />}
+                      sx={{ justifyContent: 'flex-start', color: theme.palette.text.primary, py: 1.5, textTransform: 'none', fontWeight: 500 }}
                     >
-                      Notification Settings
+                      Corporate Billing
                     </Button>
                   </CardContent>
                 </Card>
               </Grid>
 
+              {/* Right Column: Forms */}
               <Grid item xs={12} md={8}>
-                <Card sx={{ mb: 3 }}>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        Personal Information
-                      </Typography>
-                      <Button
-                        size="small"
-                        startIcon={<Edit />}
-                        onClick={() => setEditing(!editing)}
-                        sx={{ color: '#00B4B4' }}
-                      >
-                        {editing ? 'Cancel' : 'Edit'}
-                      </Button>
+                
+                {/* Personal Information */}
+                <Card sx={{ ...cardStyle, mb: 4 }}>
+                  <CardContent sx={{ p: 4 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                      <Box display="flex" alignItems="center" gap={1.5}>
+                        <Person sx={{ color: '#00B4B4' }} />
+                        <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.text.primary }}>
+                          Enterprise Identity
+                        </Typography>
+                      </Box>
                     </Box>
 
                     <Grid container spacing={3}>
                       <Grid item xs={12} sm={6}>
+                        <Typography variant="caption" sx={{ color: theme.palette.text.primary, fontWeight: 600, display: 'block', mb: 1 }}>Full Name</Typography>
                         <TextField
                           fullWidth
-                          label="Full Name"
+                          size="small"
                           value={formData.name}
                           onChange={(e) => handleInputChange('name', e.target.value)}
                           disabled={!editing}
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
                       </Grid>
                       <Grid item xs={12} sm={6}>
+                        <Typography variant="caption" sx={{ color: theme.palette.text.primary, fontWeight: 600, display: 'block', mb: 1 }}>Phone Number</Typography>
                         <TextField
                           fullWidth
-                          label="Phone Number"
+                          size="small"
                           value={formData.phone}
                           onChange={(e) => handleInputChange('phone', e.target.value)}
                           disabled={!editing}
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
                       </Grid>
                       <Grid item xs={12}>
+                        <Typography variant="caption" sx={{ color: theme.palette.text.primary, fontWeight: 600, display: 'block', mb: 1 }}>Corporate Email</Typography>
                         <TextField
                           fullWidth
-                          label="Email"
-                          value={user?.email || ''}
+                          size="small"
+                          value={user?.email || 'user@acmecorp.com'}
                           disabled
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' } }}
                         />
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid item xs={12} sm={6}>
+                        <Typography variant="caption" sx={{ color: theme.palette.text.primary, fontWeight: 600, display: 'block', mb: 1 }}>Associated Company</Typography>
                         <TextField
                           fullWidth
-                          label="Company"
+                          size="small"
                           value={formData.company}
                           onChange={(e) => handleInputChange('company', e.target.value)}
                           disabled={!editing}
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Typography variant="caption" sx={{ color: theme.palette.text.primary, fontWeight: 600, display: 'block', mb: 1 }}>Employee ID</Typography>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          value={user?.employeeId || 'EMP-94821'}
+                          disabled
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' } }}
                         />
                       </Grid>
                     </Grid>
 
                     {editing && (
-                      <Button
-                        variant="contained"
-                        startIcon={<Save />}
-                        onClick={handleSaveProfile}
-                        disabled={loading}
-                        sx={{
-                          mt: 3,
-                          background: 'linear-gradient(135deg, #00B4B4 0%, #008080 100%)',
-                        }}
-                      >
-                        {loading ? <CircularProgress size={24} color="inherit" /> : 'Save Changes'}
-                      </Button>
+                      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button
+                          variant="contained"
+                          startIcon={<Save />}
+                          onClick={handleSaveProfile}
+                          disabled={loading}
+                          sx={{
+                            py: 1,
+                            px: 4,
+                            borderRadius: '8px',
+                            backgroundColor: '#00B4B4',
+                            boxShadow: 'none',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            '&:hover': { backgroundColor: '#008080', boxShadow: 'none' }
+                          }}
+                        >
+                          {loading ? <CircularProgress size={24} color="inherit" /> : 'Save Profile Details'}
+                        </Button>
+                      </Box>
                     )}
                   </CardContent>
                 </Card>
 
-                <Card sx={{ mb: 3 }}>
-                  <CardContent>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                      Change Password
-                    </Typography>
+                {/* Security */}
+                <Card sx={{ ...cardStyle, mb: 4 }}>
+                  <CardContent sx={{ p: 4 }}>
+                    <Box display="flex" alignItems="center" gap={1.5} mb={4}>
+                      <Lock sx={{ color: '#00B4B4' }} />
+                      <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.text.primary }}>
+                        Security & Authentication
+                      </Typography>
+                    </Box>
 
                     <Grid container spacing={3}>
                       <Grid item xs={12}>
+                        <Typography variant="caption" sx={{ color: theme.palette.text.primary, fontWeight: 600, display: 'block', mb: 1 }}>Current Password</Typography>
                         <TextField
                           fullWidth
+                          size="small"
                           type="password"
-                          label="Current Password"
                           value={passwordData.currentPassword}
                           onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
                       </Grid>
                       <Grid item xs={12} sm={6}>
+                        <Typography variant="caption" sx={{ color: theme.palette.text.primary, fontWeight: 600, display: 'block', mb: 1 }}>New Password</Typography>
                         <TextField
                           fullWidth
+                          size="small"
                           type="password"
-                          label="New Password"
                           value={passwordData.newPassword}
                           onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
                       </Grid>
                       <Grid item xs={12} sm={6}>
+                        <Typography variant="caption" sx={{ color: theme.palette.text.primary, fontWeight: 600, display: 'block', mb: 1 }}>Confirm New Password</Typography>
                         <TextField
                           fullWidth
+                          size="small"
                           type="password"
-                          label="Confirm New Password"
                           value={passwordData.confirmPassword}
                           onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
                       </Grid>
                     </Grid>
 
                     <Button
-                      variant="contained"
-                      startIcon={<Lock />}
+                      variant="outlined"
                       onClick={() => {
                         if (passwordData.newPassword !== passwordData.confirmPassword) {
                           toast.error('Passwords do not match')
+                          return
+                        }
+                        if (!passwordData.currentPassword || !passwordData.newPassword) {
+                          toast.error('Please fill all password fields')
                           return
                         }
                         toast.success('Password updated successfully!')
                         setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
                       }}
                       sx={{
-                        mt: 3,
-                        background: 'linear-gradient(135deg, #00B4B4 0%, #008080 100%)',
+                        mt: 4,
+                        py: 1,
+                        px: 3,
+                        borderRadius: '8px',
+                        borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
+                        color: theme.palette.text.primary,
+                        textTransform: 'none',
+                        fontWeight: 600,
                       }}
                     >
                       Update Password
@@ -343,47 +427,62 @@ const Profile = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                      Notification Preferences
-                    </Typography>
+                {/* Notifications */}
+                <Card sx={cardStyle}>
+                  <CardContent sx={{ p: 4 }}>
+                    <Box display="flex" alignItems="center" gap={1.5} mb={3}>
+                      <Notifications sx={{ color: '#00B4B4' }} />
+                      <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.text.primary }}>
+                        Notification Preferences
+                      </Typography>
+                    </Box>
 
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                       <FormControlLabel
                         control={
                           <Switch
                             checked={notifications.email}
                             onChange={() => handleNotificationChange('email')}
+                            sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#00B4B4' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#00B4B4' } }}
                           />
                         }
-                        label="Email Notifications"
+                        label={<Typography variant="body2" sx={{ fontWeight: 500 }}>Email Notifications (Ride updates & receipts)</Typography>}
+                        sx={{ m: 0, p: 1, borderRadius: '8px', '&:hover': { bgcolor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' } }}
                       />
+                      <Divider sx={{ borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' }} />
                       <FormControlLabel
                         control={
                           <Switch
                             checked={notifications.push}
                             onChange={() => handleNotificationChange('push')}
+                            sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#00B4B4' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#00B4B4' } }}
                           />
                         }
-                        label="Push Notifications"
+                        label={<Typography variant="body2" sx={{ fontWeight: 500 }}>Push Notifications (Driver arrival alerts)</Typography>}
+                        sx={{ m: 0, p: 1, borderRadius: '8px', '&:hover': { bgcolor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' } }}
                       />
+                      <Divider sx={{ borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' }} />
                       <FormControlLabel
                         control={
                           <Switch
                             checked={notifications.sms}
                             onChange={() => handleNotificationChange('sms')}
+                            sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#00B4B4' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#00B4B4' } }}
                           />
                         }
-                        label="SMS Notifications"
+                        label={<Typography variant="body2" sx={{ fontWeight: 500 }}>SMS Notifications (Critical delays only)</Typography>}
+                        sx={{ m: 0, p: 1, borderRadius: '8px', '&:hover': { bgcolor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' } }}
                       />
                     </Box>
                   </CardContent>
                 </Card>
+
               </Grid>
             </Grid>
-          </Box>
+
+          </Container>
         </Box>
+        <Footer />
       </Box>
     </>
   )

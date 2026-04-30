@@ -3,7 +3,7 @@ const router = express.Router()
 const authController = require('../controllers/authController')
 const { authRateLimiter } = require('../middleware/rateLimiter')
 
-router.post('/register', authRateLimiter, authController.register)
+
 router.post('/login', authRateLimiter, authController.login)
 router.post('/logout', authController.logout)
 router.post('/refresh-token', authController.refreshToken)

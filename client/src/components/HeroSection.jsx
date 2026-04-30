@@ -153,7 +153,7 @@ const HeroSection = () => {
         >
           <Button
             component={RouterLink}
-            to={isAuthenticated ? '/dashboard' : '/register'}
+            to={isAuthenticated ? '/dashboard' : '/login'}
             variant="contained"
             size="large"
             sx={{
@@ -180,8 +180,8 @@ const HeroSection = () => {
             {isAuthenticated ? 'Go to Dashboard' : 'Get Started Free'}
           </Button>
           <Button
-            component={RouterLink}
-            to="/#how-it-works"
+            component="a"
+            href="#how-it-works"
             variant="outlined"
             size="large"
             sx={{

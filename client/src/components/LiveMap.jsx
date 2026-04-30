@@ -17,10 +17,10 @@ const GoogleMapComponent = lazy(() =>
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
-        background: theme === 'dark' ? '#1a1a1a' : '#f8f9fa',
+        bgcolor: 'background.paper',
         borderRadius: 2,
       }}>
-        <Typography sx={{ color: theme === 'dark' ? '#666' : '#999' }}>
+        <Typography sx={{ color: '#666' }}>
           Maps unavailable
         </Typography>
       </Box>

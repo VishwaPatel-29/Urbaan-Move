@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { motion, AnimatePresence } from 'framer-motion'
 import {
   Box,
   Typography,
@@ -11,11 +10,10 @@ import {
   InputAdornment,
   Alert,
   CircularProgress,
-  useTheme,
-  Avatar,
-  Chip,
-  Fade,
-  Container,
+  useTheme as useMuiTheme,
+  Grid,
+  Paper,
+  Divider,
 } from '@mui/material'
 import {
   Visibility,
@@ -27,17 +25,19 @@ import {
   DirectionsCar,
   AdminPanelSettings,
   RocketLaunch,
-  Security,
-  Speed,
+  CheckCircleOutline,
 } from '@mui/icons-material'
+import { Google } from '@mui/icons-material'
 import { useDispatch, useSelector } from 'react-redux'
 import { Formik, Form } from 'formik'
 import * as Yup from 'yup'
 import toast from 'react-hot-toast'
 import { setCredentials, setError, setLoading, selectAuthLoading, selectAuthError } from '../features/authSlice'
 import { authService } from '../services/api'
+import googleAuthService from '../services/googleAuth'
 
 const loginSchema = Yup.object().shape({
+  name: Yup.string().min(2, 'Name is too short').required('Name is required'),
   email: Yup.string().email('Invalid email').required('Email is required'),
   password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
   role: Yup.string().oneOf(['employee', 'driver', 'admin'], 'Invalid role').required('Role is required'),
@@ -46,20 +46,42 @@ const loginSchema = Yup.object().shape({
 const Login = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const theme = useMuiTheme()
+  const isDark = theme.palette.mode === 'dark'
+  
   const loading = useSelector(selectAuthLoading)
   const error = useSelector(selectAuthError)
   const [showPassword, setShowPassword] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const [glitchEffect, setGlitchEffect] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-    const interval = setInterval(() => {
-      setGlitchEffect(true)
-      setTimeout(() => setGlitchEffect(false), 200)
-    }, 8000)
-    return () => clearInterval(interval)
-  }, [])
+  const handleGoogleLogin = async (formName) => {
+    try {
+      setGoogleLoading(true)
+      toast.loading('Connecting to Google...', { id: 'google-auth' })
+      const userData = await googleAuthService.mockSignIn()
+      
+      const response = await authService.googleLogin({
+        email: userData.email,
+        name: formName || userData.name,
+        googleId: userData.googleId,
+        profilePicture: userData.profilePicture,
+      })
+      
+      const { user, token } = response.data
+      dispatch(setCredentials({ user, token }))
+      
+      toast.success(`Welcome back, ${user.name}!`, { id: 'google-auth' })
+      
+      setTimeout(() => {
+        navigate('/dashboard')
+      }, 800)
+    } catch (err) {
+      console.error('Google login error:', err)
+      toast.error('Google login failed', { id: 'google-auth' })
+    } finally {
+      setGoogleLoading(false)
+    }
+  }
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
@@ -91,461 +113,330 @@ const Login = () => {
   }
 
   const roleCards = [
-    { 
-      value: 'employee', 
-      label: 'Employee', 
-      icon: Person, 
-      color: '#008080',
-      gradient: 'linear-gradient(135deg, #008080 0%, #006666 100%)',
-      description: 'Book rides & manage commute'
-    },
-    { 
-      value: 'driver', 
-      label: 'Driver', 
-      icon: DirectionsCar, 
-      color: '#FF6B35',
-      gradient: 'linear-gradient(135deg, #FF6B35 0%, #FF4500 100%)',
-      description: 'Drive & earn'
-    },
-    { 
-      value: 'admin', 
-      label: 'Admin', 
-      icon: AdminPanelSettings, 
-      color: '#9B59B6',
-      gradient: 'linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%)',
-      description: 'Manage system'
-    },
+    { value: 'employee', label: 'Employee', icon: Person },
+    { value: 'driver', label: 'Driver', icon: DirectionsCar },
+    { value: 'admin', label: 'Admin', icon: AdminPanelSettings },
   ]
 
-  if (!mounted) return null
+  const featureList = [
+    "Enterprise-grade security and encryption",
+    "Real-time fleet tracking and analytics",
+    "Carbon footprint reduction tracking",
+    "Seamless API integrations"
+  ]
 
   return (
     <>
       <Helmet>
-        <title>Login | UrbanMove</title>
-        <meta name="description" content="Next-gen corporate commute platform" />
+        <title>Login | UrbanMove Enterprise</title>
       </Helmet>
 
-      <Box
-        sx={{
-          minHeight: '100vh',
-          background: '#0A0A0A',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'relative',
-          overflow: 'hidden',
-          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
-        }}
-      >
-        {/* Animated Background */}
-        <Box sx={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
-          <motion.div
-            animate={{
-              background: [
-                'radial-gradient(circle at 20% 50%, rgba(0, 128, 128, 0.1) 0%, transparent 50%)',
-                'radial-gradient(circle at 80% 80%, rgba(255, 107, 53, 0.1) 0%, transparent 50%)',
-                'radial-gradient(circle at 40% 20%, rgba(155, 89, 182, 0.1) 0%, transparent 50%)',
-              ],
-            }}
-            transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-            style={{ position: 'absolute', inset: 0 }}
-          />
+      <Box sx={{ height: '100vh', display: 'flex', bgcolor: isDark ? '#0a0a0a' : '#f4f6f8', overflow: 'hidden' }}>
+        <Grid container sx={{ flex: 1 }}>
           
-          {/* Floating Elements */}
-          {[...Array(6)].map((_, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ 
-                opacity: [0, 0.6, 0], 
-                scale: [0, 1, 0],
-                y: [0, -100, -200],
-              }}
-              transition={{
-                duration: 6 + i * 2,
-                repeat: Infinity,
-                delay: i * 1.5,
-                ease: 'easeInOut'
-              }}
-              style={{
-                position: 'absolute',
-                left: `${20 + i * 15}%`,
-                top: `${60 + (i % 2) * 20}%`,
-                width: '4px',
-                height: '4px',
-                background: ['#008080', '#FF6B35', '#9B59B6'][i % 3],
-                borderRadius: '50%',
-              }}
-            />
-          ))}
-        </Box>
+          {/* Left Side: Branding Panel (Hidden on mobile) */}
+          <Grid item xs={12} md={5} lg={6} sx={{ 
+            display: { xs: 'none', md: 'flex' }, 
+            flexDirection: 'column', 
+            bgcolor: '#0f172a', // Deep slate for enterprise feel
+            color: '#fff',
+            position: 'relative',
+            overflow: 'hidden',
+            p: { md: 4, lg: 6 },
+            height: '100vh'
+          }}>
+            {/* Geometric Background Textures */}
+            <Box sx={{ position: 'absolute', top: '-10%', left: '-10%', width: '500px', height: '500px', borderRadius: '50%', background: 'linear-gradient(135deg, rgba(0, 180, 180, 0.1) 0%, transparent 70%)', zIndex: 0 }} />
+            <Box sx={{ position: 'absolute', bottom: '-20%', right: '-10%', width: '600px', height: '600px', borderRadius: '50%', border: '2px solid rgba(255, 255, 255, 0.03)', zIndex: 0 }} />
+            <Box sx={{ position: 'absolute', bottom: '10%', right: '20%', width: '200px', height: '200px', borderRadius: '50%', border: '1px solid rgba(255, 255, 255, 0.05)', zIndex: 0 }} />
 
-        <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 10, px: 3 }}>
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-          >
-            {/* Main Login Card */}
-            <Box
-              sx={{
-                background: 'rgba(15, 15, 15, 0.95)',
-                backdropFilter: 'blur(40px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '24px',
-                p: 4,
-                position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-              }}
-            >
-              {/* Glitch Effect Overlay */}
-              <AnimatePresence>
-                {glitchEffect && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: [0, 1, 0] }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      background: 'linear-gradient(45deg, transparent, rgba(0, 128, 128, 0.1), transparent)',
-                      zIndex: 1,
-                    }}
-                  />
-                )}
-              </AnimatePresence>
+            <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', mb: 4 }}>
+              <RocketLaunch sx={{ color: '#00B4B4', fontSize: 32, mr: 2 }} />
+              <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: '-0.5px' }}>UrbanMove</Typography>
+            </Box>
 
-              {/* Header */}
-              <Box sx={{ textAlign: 'center', mb: 4, position: 'relative', zIndex: 2 }}>
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                >
-                  <Avatar
-                    sx={{
-                      width: 72,
-                      height: 72,
-                      mx: 'auto',
-                      mb: 3,
-                      background: 'linear-gradient(135deg, #008080 0%, #006666 100%)',
-                      boxShadow: '0 8px 32px rgba(0, 128, 128, 0.3)',
-                    }}
-                  >
-                    <RocketLaunch sx={{ fontSize: 36 }} />
-                  </Avatar>
-                </motion.div>
+            <Box sx={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <Typography variant="h3" sx={{ fontWeight: 800, mb: 2, letterSpacing: '-1px', lineHeight: 1.1 }}>
+                Smart Commuting for the Modern Enterprise.
+              </Typography>
+              <Typography variant="h6" sx={{ color: '#94a3b8', mb: 3, fontWeight: 400, maxWidth: '480px' }}>
+                Join hundreds of forward-thinking companies optimizing their employee transportation network.
+              </Typography>
 
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                >
-                  <Typography
-                    variant="h3"
-                    sx={{
-                      fontWeight: 800,
-                      mb: 1,
-                      background: 'linear-gradient(135deg, #FFFFFF 0%, #008080 50%, #FFFFFF 100%)',
-                      backgroundClip: 'text',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      fontSize: { xs: '2rem', sm: '2.5rem' },
-                    }}
-                  >
-                    UrbanMove
-                  </Typography>
-                  
-                  <Typography variant="body2" sx={{ color: '#888', mb: 3 }}>
-                    Next-Gen Corporate Commute Platform
-                  </Typography>
-                </motion.div>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                {featureList.map((feature, i) => (
+                  <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <CheckCircleOutline sx={{ color: '#00B4B4', fontSize: 20 }} />
+                    <Typography variant="body1" sx={{ color: '#cbd5e1', fontWeight: 500 }}>{feature}</Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          </Grid>
 
-                {/* Feature Pills */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 3 }}>
-                  <Chip
-                    icon={<Speed sx={{ fontSize: 16 }} />}
-                    label="Real-Time"
-                    size="small"
-                    sx={{
-                      background: 'rgba(0, 128, 128, 0.1)',
-                      color: '#008080',
-                      border: '1px solid rgba(0, 128, 128, 0.3)',
-                      fontSize: '0.7rem',
-                    }}
-                  />
-                  <Chip
-                    icon={<Security sx={{ fontSize: 16 }} />}
-                    label="Secure"
-                    size="small"
-                    sx={{
-                      background: 'rgba(255, 107, 53, 0.1)',
-                      color: '#FF6B35',
-                      border: '1px solid rgba(255, 107, 53, 0.3)',
-                      fontSize: '0.7rem',
-                    }}
-                  />
-                </Box>
+          {/* Right Side: Login Form */}
+          <Grid item xs={12} md={7} lg={6} sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            p: 2,
+            height: '100vh',
+            overflowY: 'auto'
+          }}>
+            <Box sx={{ width: '100%', maxWidth: '440px' }}>
+              
+              <Box sx={{ mb: 2, display: { xs: 'block', md: 'none' }, textAlign: 'center' }}>
+                <RocketLaunch sx={{ color: '#00B4B4', fontSize: 40, mb: 2 }} />
+                <Typography variant="h4" sx={{ fontWeight: 800, color: theme.palette.text.primary, letterSpacing: '-0.5px' }}>UrbanMove</Typography>
               </Box>
 
-              {/* Error Alert */}
-              <AnimatePresence>
-                {error && (
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                  >
-                    <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
-                      {error}
-                    </Alert>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <Paper elevation={0} sx={{ 
+                p: { xs: 2, sm: 3, md: 4 }, 
+                borderRadius: '16px', 
+                backgroundColor: theme.palette.background.paper,
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
+                boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.4)' : '0 4px 20px rgba(0,0,0,0.04)',
+              }}>
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.text.primary, mb: 1 }}>
+                    Sign in to your account
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                    Enter your professional credentials to access the portal.
+                  </Typography>
+                </Box>
 
-              {/* Login Form */}
-              <Formik
-                initialValues={{ email: '', password: '', role: 'employee' }}
-                validationSchema={loginSchema}
-                onSubmit={handleSubmit}
-              >
-                {({ errors, touched, isSubmitting, setFieldValue, values, handleChange, handleBlur }) => (
-                  <Form>
-                    {/* Role Selection */}
-                    <Box sx={{ mb: 4, position: 'relative', zIndex: 2 }}>
-                      <Typography variant="body2" sx={{ color: '#AAA', mb: 2, textAlign: 'center', fontWeight: 600 }}>
-                        CHOOSE YOUR ACCESS LEVEL
-                      </Typography>
-                      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5 }}>
-                        {roleCards.map((role, index) => {
-                          const Icon = role.icon
-                          return (
-                            <motion.div
-                              key={role.value}
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                            >
+                {error && (
+                  <Alert severity="error" sx={{ mb: 3, borderRadius: '8px' }}>
+                    {error}
+                  </Alert>
+                )}
+
+                <Formik
+                  initialValues={{ name: '', email: '', password: '', role: 'employee' }}
+                  validationSchema={loginSchema}
+                  onSubmit={handleSubmit}
+                >
+                  {({ errors, touched, isSubmitting, setFieldValue, values, handleChange, handleBlur }) => (
+                    <Form>
+                      
+                      {/* Role Toggle Group */}
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="caption" sx={{ color: theme.palette.text.secondary, fontWeight: 600, textTransform: 'uppercase', display: 'block', mb: 1 }}>
+                          Account Type
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1, p: 0.5, borderRadius: '8px', backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#f1f5f9', border: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}` }}>
+                          {roleCards.map((role) => {
+                            const isSelected = values.role === role.value
+                            const Icon = role.icon
+                            return (
                               <Box
+                                key={role.value}
                                 onClick={() => setFieldValue('role', role.value)}
                                 sx={{
-                                  p: 2,
-                                  textAlign: 'center',
-                                  background: values.role === role.value
-                                    ? role.gradient
-                                    : 'rgba(255, 255, 255, 0.02)',
-                                  border: values.role === role.value
-                                    ? `2px solid ${role.color}`
-                                    : '1px solid rgba(255, 255, 255, 0.1)',
-                                  borderRadius: '16px',
-                                  cursor: 'pointer',
-                                  transition: 'all 0.3s ease',
-                                  minHeight: '80px',
+                                  flex: 1,
                                   display: 'flex',
-                                  flexDirection: 'column',
+                                  alignItems: 'center',
                                   justifyContent: 'center',
-                                  '&:hover': {
-                                    background: values.role === role.value ? role.gradient : `${role.color}15`,
-                                    transform: 'translateY(-2px)',
-                                  },
+                                  gap: 1,
+                                  py: 1,
+                                  borderRadius: '6px',
+                                  cursor: 'pointer',
+                                  backgroundColor: isSelected ? theme.palette.background.paper : 'transparent',
+                                  boxShadow: isSelected ? (isDark ? '0 2px 4px rgba(0,0,0,0.4)' : '0 1px 3px rgba(0,0,0,0.1)') : 'none',
+                                  border: isSelected ? `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'}` : '1px solid transparent',
+                                  transition: 'all 0.2s ease'
                                 }}
                               >
-                                <Icon
-                                  sx={{
-                                    fontSize: 24,
-                                    color: values.role === role.value ? '#fff' : role.color,
-                                    mb: 1,
-                                  }}
-                                />
-                                <Typography
-                                  variant="caption"
-                                  sx={{
-                                    color: values.role === role.value ? '#fff' : '#AAA',
-                                    fontWeight: 600,
-                                    fontSize: '0.7rem',
-                                    lineHeight: 1.2,
-                                  }}
-                                >
+                                <Icon sx={{ fontSize: 18, color: isSelected ? '#00B4B4' : theme.palette.text.secondary }} />
+                                <Typography variant="caption" sx={{ fontWeight: isSelected ? 700 : 600, color: isSelected ? theme.palette.text.primary : theme.palette.text.secondary }}>
                                   {role.label}
                                 </Typography>
                               </Box>
-                            </motion.div>
-                          )
-                        })}
+                            )
+                          })}
+                        </Box>
                       </Box>
-                      {errors.role && touched.role && (
-                        <Typography variant="caption" color="error" sx={{ fontSize: '0.7rem', mt: 1, display: 'block', textAlign: 'center' }}>
-                          {errors.role}
-                        </Typography>
-                      )}
-                    </Box>
 
-                    {/* Email Field */}
-                    <Box sx={{ mb: 3, position: 'relative', zIndex: 2 }}>
-                      <TextField
+                      {/* Inputs */}
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 2 }}>
+                        <Box>
+                          <Typography variant="caption" sx={{ color: theme.palette.text.primary, fontWeight: 600, display: 'block', mb: 1 }}>
+                            Full Name
+                          </Typography>
+                          <TextField
+                            fullWidth
+                            name="name"
+                            placeholder="John Doe"
+                            variant="outlined"
+                            size="medium"
+                            value={values.name}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.name && Boolean(errors.name)}
+                            helperText={touched.name && errors.name}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <Person sx={{ color: theme.palette.text.secondary, fontSize: 20 }} />
+                                </InputAdornment>
+                              ),
+                            }}
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                borderRadius: '8px',
+                                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#fff',
+                              }
+                            }}
+                          />
+                        </Box>
+                        <Box>
+                          <Typography variant="caption" sx={{ color: theme.palette.text.primary, fontWeight: 600, display: 'block', mb: 1 }}>
+                            Email Address
+                          </Typography>
+                          <TextField
+                            fullWidth
+                            name="email"
+                            placeholder="you@company.com"
+                            type="email"
+                            variant="outlined"
+                            size="medium"
+                            value={values.email}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.email && Boolean(errors.email)}
+                            helperText={touched.email && errors.email}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <Email sx={{ color: theme.palette.text.secondary, fontSize: 20 }} />
+                                </InputAdornment>
+                              ),
+                            }}
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                borderRadius: '8px',
+                                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#fff',
+                              }
+                            }}
+                          />
+                        </Box>
+
+                        <Box>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', mb: 1 }}>
+                            <Typography variant="caption" sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
+                              Password
+                            </Typography>
+                            <Link to="/forgot-password" style={{ color: '#00B4B4', textDecoration: 'none', fontSize: '0.75rem', fontWeight: 600 }}>
+                              Forgot password?
+                            </Link>
+                          </Box>
+                          <TextField
+                            fullWidth
+                            name="password"
+                            placeholder="••••••••"
+                            type={showPassword ? 'text' : 'password'}
+                            variant="outlined"
+                            size="medium"
+                            value={values.password}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.password && Boolean(errors.password)}
+                            helperText={touched.password && errors.password}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <Lock sx={{ color: theme.palette.text.secondary, fontSize: 20 }} />
+                                </InputAdornment>
+                              ),
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    edge="end"
+                                    sx={{ color: theme.palette.text.secondary }}
+                                  >
+                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            }}
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                borderRadius: '8px',
+                                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#fff',
+                              }
+                            }}
+                          />
+                        </Box>
+                      </Box>
+
+                      <Button
+                        type="submit"
                         fullWidth
-                        name="email"
-                        label="Email Address"
-                        type="email"
-                        variant="outlined"
-                        value={values.email}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <Email sx={{ color: '#008080', fontSize: '1.2rem' }} />
-                            </InputAdornment>
-                          ),
-                        }}
-                        InputLabelProps={{
-                          sx: { color: '#888', '&.Mui-focused': { color: '#008080' } }
-                        }}
-                        error={touched.email && Boolean(errors.email)}
-                        helperText={touched.email && errors.email}
+                        variant="contained"
+                        size="large"
+                        disabled={isSubmitting || loading}
                         sx={{
-                          '& .MuiOutlinedInput-root': {
-                            background: 'rgba(255, 255, 255, 0.02)',
-                            color: '#fff',
-                            borderRadius: '12px',
-                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
-                            '&:hover fieldset': { borderColor: '#008080' },
-                            '&.Mui-focused fieldset': { borderColor: '#008080' },
+                          py: 1.2,
+                          borderRadius: '8px',
+                          backgroundColor: '#00B4B4',
+                          color: '#fff',
+                          fontWeight: 700,
+                          fontSize: '1rem',
+                          textTransform: 'none',
+                          boxShadow: 'none',
+                          '&:hover': {
+                            backgroundColor: '#008080',
+                            boxShadow: 'none',
                           },
-                          '& .MuiFormHelperText-root': { color: '#FF6B35', marginLeft: 0 },
                         }}
-                      />
-                    </Box>
-
-                    {/* Password Field */}
-                    <Box sx={{ mb: 4, position: 'relative', zIndex: 2 }}>
-                      <TextField
-                        fullWidth
-                        name="password"
-                        label="Password"
-                        type={showPassword ? 'text' : 'password'}
-                        variant="outlined"
-                        value={values.password}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <Lock sx={{ color: '#008080', fontSize: '1.2rem' }} />
-                            </InputAdornment>
-                          ),
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <IconButton
-                                onClick={() => setShowPassword(!showPassword)}
-                                edge="end"
-                                sx={{ color: '#888', '&:hover': { color: '#008080' } }}
-                              >
-                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                              </IconButton>
-                            </InputAdornment>
-                          ),
-                        }}
-                        InputLabelProps={{
-                          sx: { color: '#888', '&.Mui-focused': { color: '#008080' } }
-                        }}
-                        error={touched.password && Boolean(errors.password)}
-                        helperText={touched.password && errors.password}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            background: 'rgba(255, 255, 255, 0.02)',
-                            color: '#fff',
-                            borderRadius: '12px',
-                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
-                            '&:hover fieldset': { borderColor: '#008080' },
-                            '&.Mui-focused fieldset': { borderColor: '#008080' },
-                          },
-                          '& .MuiFormHelperText-root': { color: '#FF6B35', marginLeft: 0 },
-                        }}
-                      />
-                    </Box>
-
-                    {/* Submit Button */}
-                    <Box sx={{ position: 'relative', zIndex: 2 }}>
-                      <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
                       >
-                        <Button
-                          type="submit"
-                          fullWidth
-                          variant="contained"
-                          size="large"
-                          disabled={isSubmitting || loading}
-                          endIcon={<ArrowForward />}
-                          sx={{
-                            py: 3,
-                            borderRadius: '12px',
-                            background: 'linear-gradient(135deg, #008080 0%, #006666 100%)',
-                            color: '#000',
-                            fontWeight: 700,
-                            fontSize: '1rem',
-                            textTransform: 'none',
-                            boxShadow: '0 8px 32px rgba(0, 128, 128, 0.3)',
-                            border: '1px solid rgba(0, 128, 128, 0.3)',
-                            '&:hover': {
-                              background: 'linear-gradient(135deg, #006666 0%, #005555 100%)',
-                              boxShadow: '0 12px 40px rgba(0, 128, 128, 0.4)',
-                            },
-                            '&:active': { transform: 'scale(0.98)' },
-                            '&.Mui-disabled': {
-                              background: 'rgba(255, 255, 255, 0.1)',
-                              color: 'rgba(255, 255, 255, 0.3)',
-                            },
-                          }}
-                        >
-                          {loading ? <CircularProgress size={24} color="inherit" /> : 'Launch Dashboard'}
-                        </Button>
-                      </motion.div>
-                    </Box>
-                  </Form>
-                )}
-              </Formik>
+                        {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
+                      </Button>
+                      <Box sx={{ my: 2, display: 'flex', alignItems: 'center' }}>
+                        <Divider sx={{ flex: 1, borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)' }} />
+                        <Typography variant="caption" sx={{ px: 2, color: theme.palette.text.disabled, fontWeight: 600 }}>OR</Typography>
+                        <Divider sx={{ flex: 1, borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)' }} />
+                      </Box>
 
-              {/* Footer Links */}
-              <Box sx={{ textAlign: 'center', mt: 3, position: 'relative', zIndex: 2 }}>
-                <Typography variant="body2" sx={{ color: '#888' }}>
-                  No account?{' '}
-                  <Link
-                    to="/register"
-                    style={{
-                      color: '#008080',
-                      textDecoration: 'none',
-                      fontWeight: 600,
-                    }}
-                  >
-                    Create one →
-                  </Link>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        startIcon={googleLoading ? <CircularProgress size={20} color="inherit" /> : <Google />}
+                        onClick={() => handleGoogleLogin(values.name)}
+                        disabled={googleLoading || loading}
+                        sx={{ 
+                          py: 1.2, 
+                          borderRadius: '8px',
+                          borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', 
+                          color: theme.palette.text.primary, 
+                          fontWeight: 600,
+                          textTransform: 'none',
+                          '&:hover': { 
+                            backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                            borderColor: theme.palette.text.primary
+                          },
+                        }}
+                      >
+                        {googleLoading ? 'Connecting...' : 'Continue with Google'}
+                      </Button>
+                    </Form>
+                  )}
+                </Formik>
+              </Paper>
+
+
+
+              <Box sx={{ mt: 2, textAlign: 'center' }}>
+                <Typography variant="caption" sx={{ color: theme.palette.text.disabled }}>
+                  Demo Access: demo@urbanmove.com / Demo1234
                 </Typography>
               </Box>
 
-              {/* Demo Info */}
-              <Box sx={{ 
-                mt: 3, 
-                p: 2, 
-                background: 'rgba(0, 128, 128, 0.05)', 
-                borderRadius: '12px', 
-                border: '1px solid rgba(0, 128, 128, 0.2)',
-                position: 'relative',
-                zIndex: 2
-              }}>
-                <Typography variant="caption" sx={{ color: '#008080', display: 'block', mb: 1, textAlign: 'center', fontWeight: 600 }}>
-                  ⚡ QUICK ACCESS
-                </Typography>
-                <Typography variant="caption" sx={{ color: '#888', display: 'block', textAlign: 'center', fontFamily: 'monospace', fontSize: '0.7rem' }}>
-                  demo@urbanmove.com / Demo1234
-                </Typography>
-              </Box>
             </Box>
-          </motion.div>
-        </Container>
+          </Grid>
+        </Grid>
       </Box>
     </>
   )

@@ -92,7 +92,7 @@ const Booking = () => {
 
   if (bookingComplete) {
     return (
-      <Box sx={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <LottieSuccess />
         <Box sx={{ textAlign: 'center', mt: 4 }}>
           <Typography variant="h4" sx={{ color: '#00B4B4', fontWeight: 700 }}>
@@ -316,8 +316,8 @@ const Booking = () => {
   return (
     <>
       <Helmet>
-        <title>Book a Ride | KBD-Havya</title>
-        <meta name="description" content="Book an on-demand corporate shuttle with KBD-Havya." />
+        <title>Book a Ride | UrbanMove</title>
+        <meta name="description" content="Book an on-demand corporate shuttle with UrbanMove." />
       </Helmet>
 
       <Box sx={{ minHeight: '100vh', background: theme === 'dark' ? '#000' : '#f5f5f5' }}>

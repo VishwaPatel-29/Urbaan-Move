@@ -31,8 +31,8 @@ export const useAuth = () => {
       if (response.success) {
         const { user, token } = response.data
         dispatch(setUser({ user, token }))
-        setItem('kbd-havya-token', token)
-        setItem('kbd-havya-user', user)
+        setItem('urbanmove-token', token)
+        setItem('urbanmove-user', user)
         return { success: true, user }
       } else {
         throw new Error(response.message || 'Login failed')
@@ -43,25 +43,7 @@ export const useAuth = () => {
     }
   }, [dispatch])
 
-  const register = useCallback(async (userData) => {
-    try {
-      dispatch(clearError())
-      const response = await authService.register(userData)
-      
-      if (response.success) {
-        const { user, token } = response.data
-        dispatch(setUser({ user, token }))
-        setItem('kbd-havya-token', token)
-        setItem('kbd-havya-user', user)
-        return { success: true, user }
-      } else {
-        throw new Error(response.message || 'Registration failed')
-      }
-    } catch (error) {
-      console.error('Registration error:', error)
-      throw error
-    }
-  }, [dispatch])
+
 
   const googleLogin = useCallback(async (googleToken) => {
     try {
@@ -71,8 +53,8 @@ export const useAuth = () => {
       if (response.success) {
         const { user, token } = response.data
         dispatch(setUser({ user, token }))
-        setItem('kbd-havya-token', token)
-        setItem('kbd-havya-user', user)
+        setItem('urbanmove-token', token)
+        setItem('urbanmove-user', user)
         return { success: true, user }
       } else {
         throw new Error(response.message || 'Google login failed')
@@ -83,25 +65,7 @@ export const useAuth = () => {
     }
   }, [dispatch])
 
-  const googleRegister = useCallback(async (googleToken) => {
-    try {
-      dispatch(clearError())
-      const response = await authService.googleRegister(googleToken)
-      
-      if (response.success) {
-        const { user, token } = response.data
-        dispatch(setUser({ user, token }))
-        setItem('kbd-havya-token', token)
-        setItem('kbd-havya-user', user)
-        return { success: true, user }
-      } else {
-        throw new Error(response.message || 'Google registration failed')
-      }
-    } catch (error) {
-      console.error('Google registration error:', error)
-      throw error
-    }
-  }, [dispatch])
+
 
   const logoutUser = useCallback(async () => {
     try {
@@ -112,8 +76,8 @@ export const useAuth = () => {
       console.error('Logout error:', error)
     } finally {
       dispatch(logout())
-      removeItem('kbd-havya-token')
-      removeItem('kbd-havya-user')
+      removeItem('urbanmove-token')
+      removeItem('urbanmove-user')
     }
   }, [dispatch, token])
 
@@ -138,7 +102,7 @@ export const useAuth = () => {
       const response = await authService.refreshToken()
       if (response.success) {
         const { token: newToken } = response.data
-        setItem('kbd-havya-token', newToken)
+        setItem('urbanmove-token', newToken)
         return newToken
       }
     } catch (error) {
@@ -159,9 +123,7 @@ export const useAuth = () => {
     
     // Actions
     login,
-    register,
     googleLogin,
-    googleRegister,
     logout: logoutUser,
     clearError: clearAuthError,
     refreshToken,

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Helmet } from 'react-helmet-async'
 import {
   Container,
   Typography,
@@ -13,29 +14,28 @@ import {
   Alert,
   Grid,
   Avatar,
-  IconButton,
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction
+  ListItemSecondaryAction,
+  MenuItem,
+  useTheme as useMuiTheme
 } from '@mui/material'
 import {
-  Edit,
-  CameraAlt,
   Notifications,
   Security,
+  Help,
+  Settings as SettingsIcon,
   Language,
   DarkMode,
-  Help
+  LocationOn
 } from '@mui/icons-material'
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 
 const Settings = () => {
-  const [profile, setProfile] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    phone: '+1234567890'
-  })
+  const theme = useMuiTheme()
+  const isDark = theme.palette.mode === 'dark'
 
   const [preferences, setPreferences] = useState({
     notifications: true,
@@ -48,202 +48,229 @@ const Settings = () => {
 
   const [success, setSuccess] = useState(false)
 
-  const handleProfileUpdate = (field, value) => {
-    setProfile(prev => ({ ...prev, [field]: value }))
-  }
-
   const handlePreferenceChange = (field) => {
     setPreferences(prev => ({ ...prev, [field]: !prev[field] }))
   }
 
   const handleSaveSettings = () => {
     // Simulate API call
-    setTimeout(() => {
-      setSuccess(true)
-      setTimeout(() => setSuccess(false), 3000)
-    }, 1000)
+    setSuccess(true)
+    setTimeout(() => setSuccess(false), 3000)
+  }
+
+  const cardStyle = {
+    borderRadius: '12px',
+    backgroundColor: theme.palette.background.paper,
+    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
+    boxShadow: 'none',
   }
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom fontWeight="bold">
-        Settings
-      </Typography>
+    <>
+      <Helmet>
+        <title>Settings | UrbanMove Enterprise</title>
+      </Helmet>
 
-      {success && (
-        <Alert severity="success" sx={{ mb: 3 }}>
-          Settings saved successfully!
-        </Alert>
-      )}
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: isDark ? '#0a0a0a' : '#f4f6f8' }}>
+        <Navbar />
 
-      {/* Profile Settings */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box display="flex" alignItems="center" mb={3}>
-            <Avatar sx={{ width: 80, height: 80, mr: 3 }}>
-              <CameraAlt />
-            </Avatar>
-            <Box>
-              <Typography variant="h6">Profile Picture</Typography>
-              <Button variant="outlined" startIcon={<CameraAlt />} size="small">
-                Change Photo
-              </Button>
+        <Box sx={{ flexGrow: 1, pt: { xs: '80px', md: '100px' }, pb: 8 }}>
+          <Container maxWidth="lg">
+            
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h4" sx={{ fontWeight: 800, color: theme.palette.text.primary, mb: 1, letterSpacing: '-0.5px' }}>
+                System Settings
+              </Typography>
+              <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
+                Configure application behaviors and system preferences.
+              </Typography>
             </Box>
-          </Box>
 
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="First Name"
-                value={profile.firstName}
-                onChange={(e) => handleProfileUpdate('firstName', e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Last Name"
-                value={profile.lastName}
-                onChange={(e) => handleProfileUpdate('lastName', e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Email"
-                type="email"
-                value={profile.email}
-                onChange={(e) => handleProfileUpdate('email', e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Phone Number"
-                value={profile.phone}
-                onChange={(e) => handleProfileUpdate('phone', e.target.value)}
-              />
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+            {success && (
+              <Alert severity="success" sx={{ mb: 4, borderRadius: '8px' }}>
+                Enterprise settings successfully synchronized.
+              </Alert>
+            )}
 
-      {/* Notification Preferences */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box display="flex" alignItems="center" mb={2}>
-            <Notifications sx={{ mr: 2 }} />
-            <Typography variant="h6">Notification Preferences</Typography>
-          </Box>
-          <List>
-            <ListItem>
-              <ListItemText primary="Push Notifications" secondary="Receive push notifications on your device" />
-              <ListItemSecondaryAction>
-                <Switch
-                  edge="end"
-                  checked={preferences.notifications}
-                  onChange={() => handlePreferenceChange('notifications')}
-                />
-              </ListItemSecondaryAction>
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="Email Alerts" secondary="Receive trip updates via email" />
-              <ListItemSecondaryAction>
-                <Switch
-                  edge="end"
-                  checked={preferences.emailAlerts}
-                  onChange={() => handlePreferenceChange('emailAlerts')}
-                />
-              </ListItemSecondaryAction>
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="SMS Alerts" secondary="Receive important updates via SMS" />
-              <ListItemSecondaryAction>
-                <Switch
-                  edge="end"
-                  checked={preferences.smsAlerts}
-                  onChange={() => handlePreferenceChange('smsAlerts')}
-                />
-              </ListItemSecondaryAction>
-            </ListItem>
-          </List>
-        </CardContent>
-      </Card>
+            <Grid container spacing={4}>
+              <Grid item xs={12} md={6}>
+                {/* App Preferences */}
+                <Card sx={{ ...cardStyle, mb: 4 }}>
+                  <CardContent sx={{ p: 4 }}>
+                    <Box display="flex" alignItems="center" gap={1.5} mb={3}>
+                      <SettingsIcon sx={{ color: '#00B4B4' }} />
+                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                        Application Preferences
+                      </Typography>
+                    </Box>
+                    <List disablePadding>
+                      <ListItem disableGutters>
+                        <ListItemText 
+                          primary={<Typography sx={{ fontWeight: 600 }}>Theme Mode</Typography>}
+                          secondary="Toggle application dark theme" 
+                        />
+                        <ListItemSecondaryAction>
+                          <Switch
+                            edge="end"
+                            checked={preferences.darkMode}
+                            onChange={() => handlePreferenceChange('darkMode')}
+                            sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#00B4B4' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#00B4B4' } }}
+                          />
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                      <Divider sx={{ my: 1, borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' }} />
+                      <ListItem disableGutters>
+                        <ListItemText 
+                          primary={<Typography sx={{ fontWeight: 600 }}>Location Services</Typography>}
+                          secondary="Automatically detect coordinates" 
+                        />
+                        <ListItemSecondaryAction>
+                          <Switch
+                            edge="end"
+                            checked={preferences.autoLocation}
+                            onChange={() => handlePreferenceChange('autoLocation')}
+                            sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#00B4B4' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#00B4B4' } }}
+                          />
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                      <Divider sx={{ my: 1, borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' }} />
+                      <ListItem disableGutters>
+                        <ListItemText 
+                          primary={<Typography sx={{ fontWeight: 600 }}>Language</Typography>}
+                          secondary="Set global locale" 
+                        />
+                        <ListItemSecondaryAction>
+                          <TextField
+                            select
+                            size="small"
+                            value={preferences.language}
+                            onChange={(e) => setPreferences(prev => ({ ...prev, language: e.target.value }))}
+                            sx={{ minWidth: 140, '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                          >
+                            <MenuItem value="english">English (US)</MenuItem>
+                            <MenuItem value="spanish">Spanish (ES)</MenuItem>
+                            <MenuItem value="french">French (FR)</MenuItem>
+                          </TextField>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    </List>
+                  </CardContent>
+                </Card>
 
-      {/* App Preferences */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box display="flex" alignItems="center" mb={2}>
-            <Settings sx={{ mr: 2 }} />
-            <Typography variant="h6">App Preferences</Typography>
-          </Box>
-          <List>
-            <ListItem>
-              <ListItemText primary="Dark Mode" secondary="Use dark theme" />
-              <ListItemSecondaryAction>
-                <Switch
-                  edge="end"
-                  checked={preferences.darkMode}
-                  onChange={() => handlePreferenceChange('darkMode')}
-                />
-              </ListItemSecondaryAction>
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="Auto Location" secondary="Automatically detect your location" />
-              <ListItemSecondaryAction>
-                <Switch
-                  edge="end"
-                  checked={preferences.autoLocation}
-                  onChange={() => handlePreferenceChange('autoLocation')}
-                />
-              </ListItemSecondaryAction>
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="Language" secondary="Choose your preferred language" />
-              <ListItemSecondaryAction>
-                <TextField
-                  select
-                  size="small"
-                  value={preferences.language}
-                  onChange={(e) => setPreferences(prev => ({ ...prev, language: e.target.value }))}
-                  sx={{ minWidth: 120 }}
-                >
-                  <option value="english">English</option>
-                  <option value="spanish">Spanish</option>
-                  <option value="french">French</option>
-                </TextField>
-              </ListItemSecondaryAction>
-            </ListItem>
-          </List>
-        </CardContent>
-      </Card>
+                {/* Quick Actions */}
+                <Card sx={cardStyle}>
+                  <CardContent sx={{ p: 4 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>Administrative Actions</Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
+                        <Button 
+                          variant="outlined" 
+                          fullWidth 
+                          startIcon={<Security />}
+                          sx={{ py: 1.5, borderRadius: '8px', textTransform: 'none', fontWeight: 600, borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', color: theme.palette.text.primary }}
+                        >
+                          Change Password
+                        </Button>
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Button 
+                          variant="outlined" 
+                          fullWidth 
+                          startIcon={<Help />}
+                          sx={{ py: 1.5, borderRadius: '8px', textTransform: 'none', fontWeight: 600, borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', color: theme.palette.text.primary }}
+                        >
+                          Help & Support
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </Grid>
 
-      {/* Quick Actions */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" mb={2}>Quick Actions</Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <Button variant="outlined" fullWidth startIcon={<Security />}>
-                Change Password
-              </Button>
+              <Grid item xs={12} md={6}>
+                {/* Notification Preferences */}
+                <Card sx={cardStyle}>
+                  <CardContent sx={{ p: 4 }}>
+                    <Box display="flex" alignItems="center" gap={1.5} mb={3}>
+                      <Notifications sx={{ color: '#00B4B4' }} />
+                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                        Alert Configurations
+                      </Typography>
+                    </Box>
+                    <List disablePadding>
+                      <ListItem disableGutters>
+                        <ListItemText 
+                          primary={<Typography sx={{ fontWeight: 600 }}>Push Notifications</Typography>}
+                          secondary="Receive system alerts on device" 
+                        />
+                        <ListItemSecondaryAction>
+                          <Switch
+                            edge="end"
+                            checked={preferences.notifications}
+                            onChange={() => handlePreferenceChange('notifications')}
+                            sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#00B4B4' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#00B4B4' } }}
+                          />
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                      <Divider sx={{ my: 1, borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' }} />
+                      <ListItem disableGutters>
+                        <ListItemText 
+                          primary={<Typography sx={{ fontWeight: 600 }}>Email Digests</Typography>}
+                          secondary="Receive weekly commute summaries" 
+                        />
+                        <ListItemSecondaryAction>
+                          <Switch
+                            edge="end"
+                            checked={preferences.emailAlerts}
+                            onChange={() => handlePreferenceChange('emailAlerts')}
+                            sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#00B4B4' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#00B4B4' } }}
+                          />
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                      <Divider sx={{ my: 1, borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' }} />
+                      <ListItem disableGutters>
+                        <ListItemText 
+                          primary={<Typography sx={{ fontWeight: 600 }}>SMS Urgent Alerts</Typography>}
+                          secondary="For critical ride interruptions" 
+                        />
+                        <ListItemSecondaryAction>
+                          <Switch
+                            edge="end"
+                            checked={preferences.smsAlerts}
+                            onChange={() => handlePreferenceChange('smsAlerts')}
+                            sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#00B4B4' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#00B4B4' } }}
+                          />
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    </List>
+
+                    <Box display="flex" justifyContent="flex-end" mt={5}>
+                      <Button 
+                        variant="contained" 
+                        onClick={handleSaveSettings}
+                        sx={{
+                          py: 1,
+                          px: 4,
+                          borderRadius: '8px',
+                          backgroundColor: '#00B4B4',
+                          boxShadow: 'none',
+                          textTransform: 'none',
+                          fontWeight: 600,
+                          '&:hover': { backgroundColor: '#008080', boxShadow: 'none' }
+                        }}
+                      >
+                        Synchronize Settings
+                      </Button>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <Button variant="outlined" fullWidth startIcon={<Help />}>
-                Help & Support
-              </Button>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-
-      <Box display="flex" justifyContent="flex-end" mt={3}>
-        <Button variant="contained" onClick={handleSaveSettings}>
-          Save All Settings
-        </Button>
+          </Container>
+        </Box>
+        <Footer />
       </Box>
-    </Container>
+    </>
   )
 }
 

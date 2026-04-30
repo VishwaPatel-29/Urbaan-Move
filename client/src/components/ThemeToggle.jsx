@@ -1,85 +1,96 @@
 import React from 'react'
-import { motion } from 'framer-motion'
 import { useDispatch, useSelector } from 'react-redux'
+import { 
+  ToggleButtonGroup,
+  ToggleButton,
+  Box,
+  Tooltip,
+  useTheme as useMuiTheme
+} from '@mui/material'
+
 import { toggleTheme, selectTheme } from '../features/uiSlice'
 
 const ThemeToggle = () => {
   const dispatch = useDispatch()
-  const theme = useSelector(selectTheme)
+  const currentTheme = useSelector(selectTheme)
+  const muiTheme = useMuiTheme()
 
-  const handleToggle = () => {
-    dispatch(toggleTheme())
+  const handleThemeChange = (event, newTheme) => {
+    if (newTheme !== null && newTheme !== currentTheme) {
+      dispatch(toggleTheme())
+    }
   }
 
+  const isDark = muiTheme.palette.mode === 'dark'
+
   return (
-    <motion.button
-      onClick={handleToggle}
-      className="relative w-14 h-14 rounded-full overflow-hidden border-2 transition-all duration-300 hover:scale-110 active:scale-95"
-      style={{
-        borderColor: theme === 'dark' ? '#00B4B4' : '#C2185B',
-        background: theme === 'dark' ? '#000' : '#fff',
-      }}
-      whileHover={{ rotate: 180 }}
-      whileTap={{ scale: 0.9 }}
-    >
-      <div className="absolute inset-0 flex items-center justify-center">
-        {theme === 'dark' ? (
-          <motion.div
-            initial={{ rotate: -180, opacity: 0 }}
-            animate={{ rotate: 0, opacity: 1 }}
-            exit={{ rotate: 180, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="w-8 h-8 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center"
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <Tooltip 
+        title="Theme preference"
+        placement="bottom"
+        arrow
+      >
+        <ToggleButtonGroup
+          value={currentTheme}
+          exclusive
+          onChange={handleThemeChange}
+          aria-label="Theme selection"
+          sx={{
+            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+            borderRadius: '30px',
+            padding: '4px',
+            display: 'flex',
+            gap: '4px',
+            border: '1px solid',
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)',
+            '& .MuiToggleButtonGroup-grouped': {
+              border: 'none !important',
+              borderRadius: '24px !important',
+              margin: '0',
+            },
+            '& .MuiToggleButton-root': {
+              padding: '6px 16px',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              '&.Mui-selected': {
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.15)' : '#ffffff',
+                boxShadow: isDark 
+                  ? '0 4px 12px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.1)' 
+                  : '0 2px 8px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)',
+                transform: 'scale(1)',
+                '&:hover': {
+                  backgroundColor: isDark ? 'rgba(255, 255, 255, 0.2)' : '#ffffff',
+                }
+              },
+              '&:not(.Mui-selected)': {
+                opacity: 0.5,
+                transform: 'scale(0.9)',
+                '&:hover': {
+                  opacity: 0.8,
+                  backgroundColor: 'transparent',
+                  transform: 'scale(0.95)',
+                }
+              }
+            }
+          }}
+        >
+          <ToggleButton 
+            value="light" 
+            aria-label="Light mode"
+            sx={{ fontSize: '1.15rem' }}
           >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="12" cy="12" r="5" stroke="#fff" strokeWidth="2"/>
-              <path d="M12 2v4M12 18v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M2 12h4M18 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ rotate: 180, opacity: 0 }}
-            animate={{ rotate: 0, opacity: 1 }}
-            exit={{ rotate: -180, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center"
+            ☀️
+          </ToggleButton>
+          <ToggleButton 
+            value="dark" 
+            aria-label="Dark mode"
+            sx={{ fontSize: '1.15rem' }}
           >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="#fff"/>
-            </svg>
-          </motion.div>
-        )}
-      </div>
-      
-      {/* Animated ring effect */}
-      <motion.div
-        className="absolute inset-0 rounded-full border-2"
-        style={{
-          borderColor: theme === 'dark' ? '#00B4B4' : '#C2185B',
-        }}
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.5, 0, 0.5],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-    </motion.button>
+            🌙
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Tooltip>
+    </Box>
   )
 }
 

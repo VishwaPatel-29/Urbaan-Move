@@ -90,7 +90,7 @@ const About = () => {
         <meta name="description" content="Learn about UrbanMove - The future of urban transportation" />
       </Helmet>
 
-      <Box sx={{ minHeight: '100vh', background: '#000' }}>
+      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
         <Navbar />
 
         <Container maxWidth="lg" sx={{ py: 8 }}>
@@ -280,7 +280,7 @@ const About = () => {
                 <Button
                   variant="contained"
                   size="large"
-                  onClick={() => navigate('/register')}
+                  onClick={() => navigate('/contact')}
                   sx={{
                     background: 'linear-gradient(135deg, #00B4B4 0%, #008080 100%)',
                     '&:hover': {

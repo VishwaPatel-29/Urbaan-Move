@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api'
+import { GoogleMap, useJsApiLoader, Marker, InfoWindow, TrafficLayer } from '@react-google-maps/api'
 import { Box, CircularProgress } from '@mui/material'
 import { LocationOn } from '@mui/icons-material'
 import { useSelector } from 'react-redux'
@@ -8,7 +8,6 @@ import { useAuth } from '../hooks/useAuth'
 
 const containerStyle = {
   width: '100%',
-  height: '400px',
   borderRadius: '12px',
 }
 
@@ -36,7 +35,15 @@ const lightMapStyles = [
   { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
 ]
 
-const GoogleMapComponent = ({ apiKey }) => {
+const GoogleMapComponent = ({ 
+  apiKey, 
+  height = '400px',
+  mapType = 'standard',
+  zoom = 14,
+  onZoomChange,
+  showTraffic = false,
+  centerLocation,
+}) => {
   const theme = useSelector(selectTheme)
   const { isAuthenticated } = useAuth()
   
@@ -49,7 +56,7 @@ const GoogleMapComponent = ({ apiKey }) => {
   if (!apiKey) {
     return (
       <Box sx={{ 
-        height: '400px', 
+        height: height, 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
@@ -105,7 +112,7 @@ const GoogleMapComponent = ({ apiKey }) => {
   if (loadError) {
     return (
       <Box sx={{ 
-        height: '400px', 
+        height: height, 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
@@ -125,7 +132,7 @@ const GoogleMapComponent = ({ apiKey }) => {
   if (!isLoaded) {
     return (
       <Box sx={{ 
-        height: '400px', 
+        height: height, 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
@@ -138,13 +145,16 @@ const GoogleMapComponent = ({ apiKey }) => {
   }
 
   return (
-    <Box sx={{ position: 'relative', borderRadius: 2, overflow: 'hidden' }}>
+    <Box sx={{ position: 'relative', borderRadius: 2, overflow: 'hidden', height: height }}>
       <GoogleMap
-        mapContainerStyle={containerStyle}
-        center={currentLocation}
-        zoom={14}
+        mapContainerStyle={{ ...containerStyle, height }}
+        center={centerLocation || currentLocation}
+        zoom={zoom}
         onLoad={onLoad}
         onUnmount={onUnmount}
+        onZoomChanged={() => {
+          if (map && onZoomChange) onZoomChange(map.getZoom())
+        }}
         options={{
           disableDefaultUI: true,
           zoomControl: true,
@@ -152,8 +162,10 @@ const GoogleMapComponent = ({ apiKey }) => {
           streetViewControl: false,
           fullscreenControl: false,
           styles: theme === 'dark' ? darkMapStyles : lightMapStyles,
+          mapTypeId: mapType === 'standard' ? 'roadmap' : mapType
         }}
       >
+        {showTraffic && <TrafficLayer />}
         <Marker
           position={currentLocation}
           icon={{

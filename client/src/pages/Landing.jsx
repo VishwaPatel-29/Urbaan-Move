@@ -12,7 +12,7 @@ const FeaturesSection = lazy(() => import('../components/FeaturesSection'))
 const HowItWorks = lazy(() => import('../components/HowItWorks'))
 const TestimonialsSection = lazy(() => import('../components/TestimonialsSection'))
 const CTASection = lazy(() => import('../components/CTASection'))
-const HelixAIButton = lazy(() => import('../components/HelixAIButton'))
+
 
 const Landing = () => {
   const theme = useSelector(selectTheme)
@@ -61,9 +61,7 @@ const Landing = () => {
           <CTASection />
         </Suspense>
 
-        <Suspense fallback={<LottieLoader />}>
-          <HelixAIButton />
-        </Suspense>
+
 
         <Footer />
       </Box>

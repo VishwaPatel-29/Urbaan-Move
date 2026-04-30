@@ -102,46 +102,7 @@ const login = async (req, res) => {
   }
 }
 
-const register = async (req, res) => {
-  try {
-    const { name, email, password, phone, company, employeeId } = req.body
-    
-    const existingUser = await User.findOne({ email })
-    if (existingUser) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'Email already registered',
-      })
-    }
-    
-    const user = await User.create({
-      name,
-      email,
-      password,
-      phone,
-      company,
-      employeeId,
-    })
-    
-    const token = generateToken(user._id, user.role)
-    const refreshToken = generateRefreshToken(user._id)
-    
-    res.status(201).json({
-      status: 'success',
-      data: {
-        user,
-        token,
-        refreshToken,
-      },
-    })
-  } catch (error) {
-    console.error('Registration error:', error)
-    res.status(500).json({
-      status: 'error',
-      message: 'Registration failed',
-    })
-  }
-}
+
 
 const logout = async (req, res) => {
   res.json({
@@ -201,7 +162,6 @@ const resetPassword = async (req, res) => {
 
 module.exports = {
   login,
-  register,
   logout,
   refreshToken,
   forgotPassword,

@@ -105,6 +105,44 @@ const updateUser = async (req, res) => {
   }
 }
 
+const createUser = async (req, res) => {
+  try {
+    const { name, email, password, phone, company, employeeId, role } = req.body
+    
+    // Check if user already exists
+    const existingUser = await User.findOne({ email })
+    if (existingUser) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Email already registered',
+      })
+    }
+    
+    // Create new user
+    const user = await User.create({
+      name,
+      email,
+      password,
+      phone,
+      company,
+      employeeId,
+      role: role || 'employee',
+    })
+    
+    res.status(201).json({
+      status: 'success',
+      data: user,
+      message: 'User created successfully',
+    })
+  } catch (error) {
+    console.error('Create user error:', error)
+    res.status(500).json({
+      status: 'error',
+      message: error.message || 'Failed to create user',
+    })
+  }
+}
+
 const deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id)
@@ -131,5 +169,6 @@ module.exports = {
   getUsers,
   getUser,
   updateUser,
+  createUser,
   deleteUser,
 }

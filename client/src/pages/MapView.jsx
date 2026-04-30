@@ -25,7 +25,10 @@ import {
   Badge,
   Tooltip,
   Fab,
-  Drawer
+  Drawer,
+  Divider,
+  useTheme,
+  alpha
 } from '@mui/material'
 import {
   Navigation,
@@ -37,11 +40,9 @@ import {
   DirectionsCar,
   Person,
   LocationOn,
-  AccessTime,
   Star,
   Phone,
   Chat,
-  FilterList,
   Settings,
   Traffic,
   Directions,
@@ -49,10 +50,17 @@ import {
   Map as MapIcon,
   Search,
   Clear,
-  Add
 } from '@mui/icons-material'
 
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
+import GoogleMapComponent from '../components/GoogleMapComponent'
+import GOOGLE_MAPS_CONFIG from '../utils/googleMapsConfig'
+
 const MapView = () => {
+  const theme = useTheme()
+  const isDark = theme.palette.mode === 'dark'
+
   const [mapType, setMapType] = useState('standard')
   const [showTraffic, setShowTraffic] = useState(false)
   const [showDirections, setShowDirections] = useState(false)
@@ -62,6 +70,16 @@ const MapView = () => {
   const [showHeatmap, setShowHeatmap] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState('all')
   const [showSettingsDrawer, setShowSettingsDrawer] = useState(false)
+  const [mapCenter, setMapCenter] = useState(null)
+
+  const handleCenterMap = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => setMapCenter({ lat: position.coords.latitude, lng: position.coords.longitude }),
+        () => alert('Could not get your location.')
+      )
+    }
+  }
 
   const mapTypes = [
     { value: 'standard', label: 'Standard', icon: <MapIcon /> },
@@ -81,10 +99,8 @@ const MapView = () => {
     {
       id: 'DRV001',
       name: 'Sarah Johnson',
-      location: { lat: 40.7128, lng: -74.0060 },
       distance: '0.3 mi',
       rating: 4.9,
-      trips: 523,
       vehicle: 'Toyota Camry - Silver',
       status: 'available',
       eta: '2 min'
@@ -92,10 +108,8 @@ const MapView = () => {
     {
       id: 'DRV002',
       name: 'Mike Wilson',
-      location: { lat: 40.7260, lng: -73.9897 },
       distance: '0.5 mi',
       rating: 4.7,
-      trips: 412,
       vehicle: 'Honda Accord - Blue',
       status: 'available',
       eta: '3 min'
@@ -103,10 +117,8 @@ const MapView = () => {
     {
       id: 'DRV003',
       name: 'John Smith',
-      location: { lat: 40.7489, lng: -73.9680 },
       distance: '0.8 mi',
       rating: 4.8,
-      trips: 678,
       vehicle: 'Nissan Altima - Black',
       status: 'busy',
       eta: 'N/A'
@@ -118,8 +130,6 @@ const MapView = () => {
       id: 'RIDE001',
       driver: 'Sarah Johnson',
       passenger: 'John Doe',
-      pickup: { lat: 40.7128, lng: -74.0060 },
-      dropoff: { lat: 40.7580, lng: -73.9855 },
       status: 'en_route',
       progress: 65
     },
@@ -127,37 +137,17 @@ const MapView = () => {
       id: 'RIDE002',
       driver: 'Mike Wilson',
       passenger: 'Jane Smith',
-      pickup: { lat: 40.7260, lng: -73.9897 },
-      dropoff: { lat: 40.7489, lng: -73.9680 },
       status: 'in_progress',
       progress: 35
     }
   ]
 
   const hotspots = [
-    { name: 'Times Square', lat: 40.7580, lng: -73.9855, demand: 'High' },
-    { name: 'Central Park', lat: 40.7829, lng: -73.9654, demand: 'Medium' },
-    { name: 'Brooklyn Bridge', lat: 40.7061, lng: -73.9969, demand: 'High' },
-    { name: 'Grand Central', lat: 40.7527, lng: -73.9772, demand: 'Medium' }
+    { name: 'Times Square', demand: 'High' },
+    { name: 'Central Park', demand: 'Medium' },
+    { name: 'Brooklyn Bridge', demand: 'High' },
+    { name: 'Grand Central', demand: 'Medium' }
   ]
-
-  const handleZoomIn = () => {
-    setZoomLevel(prev => Math.min(prev + 1, 20))
-  }
-
-  const handleZoomOut = () => {
-    setZoomLevel(prev => Math.max(prev - 1, 1))
-  }
-
-  const handleCenterMap = () => {
-    // Simulate centering on user location
-    console.log('Centering on user location')
-  }
-
-  const handleFullscreen = () => {
-    // Toggle fullscreen
-    console.log('Toggle fullscreen')
-  }
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -177,458 +167,307 @@ const MapView = () => {
     }
   }
 
+  const glassCardStyle = {
+    background: isDark ? alpha(theme.palette.background.paper, 0.6) : alpha('#ffffff', 0.8),
+    backdropFilter: 'blur(16px)',
+    border: '1px solid',
+    borderColor: isDark ? alpha('#ffffff', 0.05) : alpha('#000000', 0.05),
+    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.4)' : '0 8px 32px rgba(0,0,0,0.05)',
+    borderRadius: '16px',
+    transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+    '&:hover': {
+      boxShadow: isDark ? '0 8px 32px rgba(0,180,180,0.15)' : '0 8px 32px rgba(0,180,180,0.1)',
+    }
+  }
+
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom fontWeight="bold">
-        Live Map View
-      </Typography>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
+      <Navbar />
 
-      <Grid container spacing={3}>
-        {/* Map Controls */}
-        <Grid item xs={12} md={3}>
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>Map Settings</Typography>
-              
-              <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-                <InputLabel>Map Type</InputLabel>
-                <Select
-                  value={mapType}
-                  label="Map Type"
-                  onChange={(e) => setMapType(e.target.value)}
-                >
-                  {mapTypes.map(type => (
-                    <MenuItem key={type.value} value={type.value}>
-                      <Box display="flex" alignItems="center">
-                        {type.icon}
-                        <Typography sx={{ ml: 1 }}>{type.label}</Typography>
-                      </Box>
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+      <Box sx={{ flexGrow: 1, pt: { xs: 10, md: 12 }, pb: 6, px: { xs: 2, md: 4 } }}>
+        <Container maxWidth="xxl" disableGutters>
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+            <Box>
+              <Typography variant="h4" fontWeight="800" sx={{ letterSpacing: '-0.5px' }}>
+                Live Fleet Map
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Real-time tracking and dispatch dashboard
+              </Typography>
+            </Box>
+            <Button
+              variant="contained"
+              startIcon={<Settings />}
+              onClick={() => setShowSettingsDrawer(true)}
+              sx={{
+                bgcolor: '#00B4B4',
+                color: '#fff',
+                borderRadius: '12px',
+                px: 3,
+                py: 1,
+                boxShadow: '0 4px 14px rgba(0, 180, 180, 0.3)',
+                '&:hover': { bgcolor: '#009090' }
+              }}
+            >
+              Settings
+            </Button>
+          </Box>
 
-              <Typography variant="body2" gutterBottom>Zoom Level: {zoomLevel}</Typography>
-              <Slider
-                value={zoomLevel}
-                onChange={(e, value) => setZoomLevel(value)}
-                min={1}
-                max={20}
-                step={1}
-                marks={[
-                  { value: 1, label: '1' },
-                  { value: 10, label: '10' },
-                  { value: 20, label: '20' }
-                ]}
-                sx={{ mb: 2 }}
-              />
+          <Grid container spacing={4}>
+            {/* Map Controls */}
+            <Grid item xs={12} lg={3}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <Card sx={glassCardStyle}>
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography variant="h6" fontWeight="700" gutterBottom>Map Settings</Typography>
+                    
+                    <FormControl fullWidth size="small" sx={{ mb: 3, mt: 1 }}>
+                      <InputLabel>Map Type</InputLabel>
+                      <Select
+                        value={mapType}
+                        label="Map Type"
+                        onChange={(e) => setMapType(e.target.value)}
+                        sx={{ borderRadius: '8px' }}
+                      >
+                        {mapTypes.map(type => (
+                          <MenuItem key={type.value} value={type.value}>
+                            <Box display="flex" alignItems="center">
+                              {type.icon}
+                              <Typography sx={{ ml: 1.5 }}>{type.label}</Typography>
+                            </Box>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
 
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={showTraffic}
-                    onChange={(e) => setShowTraffic(e.target.checked)}
-                  />
-                }
-                label={<Box display="flex" alignItems="center"><Traffic sx={{ mr: 1 }} />Traffic</Box>}
-                sx={{ mb: 1 }}
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={showDirections}
-                    onChange={(e) => setShowDirections(e.target.checked)}
-                  />
-                }
-                label={<Box display="flex" alignItems="center"><Directions sx={{ mr: 1 }} />Directions</Box>}
-                sx={{ mb: 1 }}
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={showHeatmap}
-                    onChange={(e) => setShowHeatmap(e.target.checked)}
-                  />
-                }
-                label="Demand Heatmap"
-              />
-            </CardContent>
-          </Card>
+                    <Typography variant="body2" color="text.secondary" gutterBottom>Zoom Level</Typography>
+                    <Slider
+                      value={zoomLevel}
+                      onChange={(e, value) => setZoomLevel(value)}
+                      min={1}
+                      max={20}
+                      step={1}
+                      sx={{ 
+                        mb: 3,
+                        color: '#00B4B4',
+                        '& .MuiSlider-thumb': {
+                          boxShadow: '0 0 10px rgba(0,180,180,0.5)',
+                        }
+                      }}
+                    />
 
-          {/* Filters */}
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>Filters</Typography>
-              
-              <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-                <InputLabel>Show</InputLabel>
-                <Select
-                  value={selectedFilter}
-                  label="Show"
-                  onChange={(e) => setSelectedFilter(e.target.value)}
-                >
-                  {filters.map(filter => (
-                    <MenuItem key={filter.value} value={filter.value}>
-                      <Chip
-                        label={filter.label}
-                        color={filter.color}
-                        size="small"
-                        sx={{ mr: 1 }}
-                      />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                    <Divider sx={{ mb: 2, borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
 
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={showDrivers}
-                    onChange={(e) => setShowDrivers(e.target.checked)}
-                  />
-                }
-                label="Show Drivers"
-                sx={{ mb: 1 }}
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={showUsers}
-                    onChange={(e) => setShowUsers(e.target.checked)}
-                  />
-                }
-                label="Show Users"
-              />
-            </CardContent>
-          </Card>
+                    <FormControlLabel
+                      control={<Switch checked={showTraffic} onChange={(e) => setShowTraffic(e.target.checked)} color="primary" />}
+                      label={<Box display="flex" alignItems="center"><Traffic sx={{ mr: 1, color: 'text.secondary', fontSize: 20 }} />Traffic Layer</Box>}
+                      sx={{ mb: 1 }}
+                    />
+                    <FormControlLabel
+                      control={<Switch checked={showDirections} onChange={(e) => setShowDirections(e.target.checked)} color="primary" />}
+                      label={<Box display="flex" alignItems="center"><Directions sx={{ mr: 1, color: 'text.secondary', fontSize: 20 }} />Route Directions</Box>}
+                      sx={{ mb: 1 }}
+                    />
+                    <FormControlLabel
+                      control={<Switch checked={showHeatmap} onChange={(e) => setShowHeatmap(e.target.checked)} color="primary" />}
+                      label="Demand Heatmap"
+                    />
+                  </CardContent>
+                </Card>
 
-          {/* Map Actions */}
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>Actions</Typography>
-              
-              <Box display="flex" flexDirection="column" gap={1}>
-                <Button
-                  variant="outlined"
-                  startIcon={<MyLocation />}
-                  onClick={handleCenterMap}
-                  fullWidth
-                >
-                  Center Location
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<Search />}
-                  fullWidth
-                >
-                  Search Location
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<Clear />}
-                  fullWidth
-                >
-                  Clear Filters
-                </Button>
+                <Card sx={glassCardStyle}>
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography variant="h6" fontWeight="700" gutterBottom>Filters</Typography>
+                    
+                    <FormControl fullWidth size="small" sx={{ mb: 3, mt: 1 }}>
+                      <InputLabel>Status</InputLabel>
+                      <Select
+                        value={selectedFilter}
+                        label="Status"
+                        onChange={(e) => setSelectedFilter(e.target.value)}
+                        sx={{ borderRadius: '8px' }}
+                      >
+                        {filters.map(filter => (
+                          <MenuItem key={filter.value} value={filter.value}>
+                            <Chip label={filter.label} color={filter.color} size="small" sx={{ borderRadius: '6px' }} />
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+
+                    <FormControlLabel
+                      control={<Switch checked={showDrivers} onChange={(e) => setShowDrivers(e.target.checked)} />}
+                      label="Show Active Drivers"
+                      sx={{ mb: 1 }}
+                    />
+                    <FormControlLabel
+                      control={<Switch checked={showUsers} onChange={(e) => setShowUsers(e.target.checked)} />}
+                      label="Show Waiting Users"
+                    />
+                  </CardContent>
+                </Card>
               </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+            </Grid>
 
-        {/* Map Area */}
-        <Grid item xs={12} md={6}>
-          <Card sx={{ height: '600px', position: 'relative' }}>
-            <CardContent sx={{ height: '100%', p: 0, position: 'relative' }}>
-              {/* Simulated Map */}
-              <Box
-                sx={{
-                  height: '100%',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  position: 'relative'
-                }}
-              >
-                <Box textAlign="center">
-                  <Map sx={{ fontSize: 64, mb: 2 }} />
-                  <Typography variant="h6">Interactive Map View</Typography>
-                  <Typography variant="body2">
-                    {mapType.charAt(0).toUpperCase() + mapType.slice(1)} Map • Zoom: {zoomLevel}
-                  </Typography>
-                  {showTraffic && (
-                    <Typography variant="body2" sx={{ mt: 1 }}>
-                      Traffic Layer: Active
-                    </Typography>
-                  )}
-                  {showHeatmap && (
-                    <Typography variant="body2" sx={{ mt: 1 }}>
-                      Demand Heatmap: Active
-                    </Typography>
-                  )}
+            {/* Map Area */}
+            <Grid item xs={12} lg={6}>
+              <Card sx={{ 
+                ...glassCardStyle, 
+                height: { xs: '500px', lg: 'calc(100vh - 200px)' }, 
+                minHeight: '600px',
+                p: 1,
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                <Box sx={{ flexGrow: 1, position: 'relative', borderRadius: '12px', overflow: 'hidden' }}>
+                  <GoogleMapComponent 
+                    apiKey={GOOGLE_MAPS_CONFIG.getApiKey()} 
+                    height="100%" 
+                    mapType={mapType}
+                    zoom={zoomLevel}
+                    onZoomChange={setZoomLevel}
+                    showTraffic={showTraffic}
+                    centerLocation={mapCenter}
+                  />
+                  
+                  {/* Floating Action Buttons over Map */}
+                  <Box position="absolute" top={16} right={16} display="flex" flexDirection="column" gap={1}>
+                    <Paper elevation={4} sx={{ borderRadius: '12px', overflow: 'hidden', bgcolor: 'background.paper' }}>
+                      <IconButton onClick={() => setZoomLevel(prev => Math.min(prev + 1, 20))} size="large">
+                        <ZoomIn />
+                      </IconButton>
+                      <Divider />
+                      <IconButton onClick={() => setZoomLevel(prev => Math.max(prev - 1, 1))} size="large">
+                        <ZoomOut />
+                      </IconButton>
+                    </Paper>
+                    <Paper elevation={4} sx={{ borderRadius: '50%', overflow: 'hidden', mt: 1, bgcolor: 'background.paper' }}>
+                      <IconButton onClick={handleCenterMap} size="large">
+                        <MyLocation />
+                      </IconButton>
+                    </Paper>
+                  </Box>
                 </Box>
+              </Card>
+            </Grid>
 
-                {/* Map Controls Overlay */}
-                <Box position="absolute" top={16} right={16}>
-                  <Paper elevation={3} sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <IconButton onClick={handleZoomIn}>
-                      <ZoomIn />
-                    </IconButton>
-                    <IconButton onClick={handleZoomOut}>
-                      <ZoomOut />
-                    </IconButton>
-                    <Divider />
-                    <IconButton onClick={handleCenterMap}>
-                      <MyLocation />
-                    </IconButton>
-                    <IconButton onClick={handleFullscreen}>
-                      <Fullscreen />
-                    </IconButton>
-                  </Paper>
-                </Box>
-
-                {/* Simulated Map Markers */}
-                {showDrivers && nearbyDrivers.slice(0, 3).map((driver, index) => (
-                  <Box
-                    key={driver.id}
-                    sx={{
-                      position: 'absolute',
-                      top: `${20 + index * 15}%`,
-                      left: `${15 + index * 20}%`,
-                      transform: 'translate(-50%, -50%)'
-                    }}
-                  >
-                    <Badge
-                      overlap="circular"
-                      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                      badgeContent={
-                        <Chip
-                          label={driver.status}
-                          color={getStatusColor(driver.status)}
-                          size="small"
+            {/* Side Panel: Lists */}
+            <Grid item xs={12} lg={3}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, height: { xs: 'auto', lg: 'calc(100vh - 200px)' } }}>
+                
+                {/* Nearby Drivers */}
+                {showDrivers && (
+                  <Card sx={{ ...glassCardStyle, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <CardContent sx={{ p: 0, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      <Box p={3} pb={2}>
+                        <Typography variant="h6" fontWeight="700">Nearby Drivers</Typography>
+                      </Box>
+                      <List sx={{ overflowY: 'auto', px: 2, pb: 2 }}>
+                        {nearbyDrivers.map((driver) => (
+                          <ListItem key={driver.id} sx={{ mb: 1.5, bgcolor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderRadius: '12px' }}>
+                            <ListItemIcon>
+                              <Avatar sx={{ width: 44, height: 44, bgcolor: '#00B4B4', color: '#fff' }}>
+                                <DirectionsCar />
+                              </Avatar>
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={
+                                <Box display="flex" justifyContent="space-between" alignItems="center">
+                                  <Typography variant="subtitle2" fontWeight="600">{driver.name}</Typography>
+                                  <Chip label={driver.status} color={getStatusColor(driver.status)} size="small" sx={{ height: 20, fontSize: '0.7rem' }} />
+                            </Box>
+                          }
+                          secondary={
+                            <Box mt={0.5}>
+                              <Typography variant="caption" display="block" color="text.secondary">
+                                {driver.vehicle}
+                              </Typography>
+                              <Box display="flex" alignItems="center" gap={1} mt={0.5}>
+                                <Typography variant="caption" color="text.primary" fontWeight="500">ETA: {driver.eta}</Typography>
+                                <Box display="flex" alignItems="center">
+                                  <Star sx={{ fontSize: 14, color: '#FFD700', mr: 0.5 }} />
+                                  <Typography variant="caption">{driver.rating}</Typography>
+                                </Box>
+                              </Box>
+                            </Box>
+                          }
                         />
-                      }
-                    >
-                      <Avatar sx={{ bgcolor: 'success.main', width: 40, height: 40 }}>
-                        <DirectionsCar />
-                      </Avatar>
-                    </Badge>
-                  </Box>
-                ))}
+                        <Box display="flex" flexDirection="column" gap={0.5} ml={1}>
+                          <IconButton size="small" onClick={() => window.open('tel:+1234567890', '_self')} sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}>
+                            <Phone fontSize="small" color="primary" />
+                          </IconButton>
+                          <IconButton size="small" onClick={() => alert(`Starting chat with ${driver.name}...`)} sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}>
+                            <Chat fontSize="small" color="secondary" />
+                          </IconButton>
+                        </Box>
+                      </ListItem>
+                    ))}
+                      </List>
+                    </CardContent>
+                  </Card>
+                )}
 
-                {showUsers && (
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: '60%',
-                      left: '70%',
-                      transform: 'translate(-50%, -50%)'
-                    }}
-                  >
-                    <Avatar sx={{ bgcolor: 'primary.main', width: 40, height: 40 }}>
-                      <Person />
-                    </Avatar>
-                  </Box>
+                {/* Demand Hotspots */}
+                {(selectedFilter === 'all' || selectedFilter === 'hotspots') && (
+                  <Card sx={{ ...glassCardStyle, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <CardContent sx={{ p: 0, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      <Box p={3} pb={2}>
+                        <Typography variant="h6" fontWeight="700">Demand Hotspots</Typography>
+                      </Box>
+                      <List sx={{ overflowY: 'auto', px: 2, pb: 2 }}>
+                        {hotspots.map((hotspot, index) => (
+                          <ListItem key={index} sx={{ mb: 1, borderBottom: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}>
+                            <ListItemIcon sx={{ minWidth: 40 }}>
+                              <LocationOn color={hotspot.demand === 'High' ? 'error' : 'warning'} />
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={<Typography variant="body2" fontWeight="500">{hotspot.name}</Typography>}
+                            />
+                            <Chip
+                              label={`${hotspot.demand} Demand`}
+                              color={getDemandColor(hotspot.demand)}
+                              size="small"
+                              sx={{ borderRadius: '6px' }}
+                            />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </CardContent>
+                  </Card>
                 )}
               </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
 
-        {/* Side Panel */}
-        <Grid item xs={12} md={3}>
-          {/* Nearby Drivers */}
-          {showDrivers && (
-            <Card sx={{ mb: 3 }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>Nearby Drivers</Typography>
-                <List dense>
-                  {nearbyDrivers.map((driver) => (
-                    <ListItem key={driver.id} divider>
-                      <ListItemIcon>
-                        <Avatar sx={{ width: 40, height: 40, bgcolor: 'success.main' }}>
-                          <DirectionsCar />
-                        </Avatar>
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <Box>
-                            <Typography variant="subtitle2">{driver.name}</Typography>
-                            <Box display="flex" alignItems="center" gap={1}>
-                              <Star sx={{ fontSize: 14, color: 'warning.main' }} />
-                              <Typography variant="caption">{driver.rating}</Typography>
-                              <Chip
-                                label={driver.status}
-                                color={getStatusColor(driver.status)}
-                                size="small"
-                              />
-                            </Box>
-                          </Box>
-                        }
-                        secondary={
-                          <Box>
-                            <Typography variant="caption" display="block">
-                              {driver.vehicle}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {driver.distance} • ETA: {driver.eta}
-                            </Typography>
-                          </Box>
-                        }
-                      />
-                      <Box display="flex" flexDirection="column" gap={0.5}>
-                        <IconButton size="small">
-                          <Phone fontSize="small" />
-                        </IconButton>
-                        <IconButton size="small">
-                          <Chat fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    </ListItem>
-                  ))}
-                </List>
-              </CardContent>
-            </Card>
-          )}
 
-          {/* Active Rides */}
-          {selectedFilter === 'all' || selectedFilter === 'active' ? (
-            <Card sx={{ mb: 3 }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>Active Rides</Typography>
-                <List dense>
-                  {activeRides.map((ride) => (
-                    <ListItem key={ride.id} divider>
-                      <ListItemIcon>
-                        <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main' }}>
-                          <Navigation />
-                        </Avatar>
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <Box>
-                            <Typography variant="subtitle2">
-                              {ride.driver} → {ride.passenger}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              Progress: {ride.progress}%
-                            </Typography>
-                          </Box>
-                        }
-                        secondary={
-                          <Typography variant="caption">
-                            Status: {ride.status.replace('_', ' ')}
-                          </Typography>
-                        }
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              </CardContent>
-            </Card>
-          ) : null}
 
-          {/* Demand Hotspots */}
-          {selectedFilter === 'all' || selectedFilter === 'hotspots' ? (
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>Demand Hotspots</Typography>
-                <List dense>
-                  {hotspots.map((hotspot, index) => (
-                    <ListItem key={index} divider>
-                      <ListItemIcon>
-                        <LocationOn color="error" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={hotspot.name}
-                        secondary={
-                          <Chip
-                            label={`${hotspot.demand} Demand`}
-                            color={getDemandColor(hotspot.demand)}
-                            size="small"
-                          />
-                        }
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              </CardContent>
-            </Card>
-          ) : null}
-        </Grid>
-      </Grid>
-
-      {/* Floating Action Button */}
-      <Fab
-        color="primary"
-        sx={{
-          position: 'fixed',
-          bottom: 24,
-          right: 24
-        }}
-        onClick={() => setShowSettingsDrawer(true)}
-      >
-        <Settings />
-      </Fab>
-
-      {/* Settings Drawer */}
       <Drawer
-        anchor="right"
+        anchor="left"
         open={showSettingsDrawer}
         onClose={() => setShowSettingsDrawer(false)}
+        PaperProps={{
+          sx: {
+            width: 320,
+            bgcolor: 'background.paper',
+            p: 3
+          }
+        }}
       >
-        <Box sx={{ width: 300, p: 2 }}>
-          <Typography variant="h6" gutterBottom>Advanced Settings</Typography>
-          <Divider sx={{ mb: 2 }} />
-          
-          <Typography variant="subtitle2" gutterBottom>Display Options</Typography>
-          <FormControlLabel
-            control={<Switch defaultChecked />}
-            label="3D Buildings"
-            sx={{ mb: 1 }}
-          />
-          <FormControlLabel
-            control={<Switch defaultChecked />}
-            label="Street Names"
-            sx={{ mb: 1 }}
-          />
-          <FormControlLabel
-            control={<Switch />}
-            label="Compass"
-            sx={{ mb: 2 }}
-          />
-
-          <Typography variant="subtitle2" gutterBottom>Data Layers</Typography>
-          <FormControlLabel
-            control={<Switch />}
-            label="Weather"
-            sx={{ mb: 1 }}
-          />
-          <FormControlLabel
-            control={<Switch />}
-            label="Public Transport"
-            sx={{ mb: 1 }}
-          />
-          <FormControlLabel
-            control={<Switch />}
-            label="Bike Lanes"
-            sx={{ mb: 2 }}
-          />
-
-          <Typography variant="subtitle2" gutterBottom>Performance</Typography>
-          <FormControlLabel
-            control={<Switch defaultChecked />}
-            label="High Quality Mode"
-            sx={{ mb: 1 }}
-          />
-          <FormControlLabel
-            control={<Switch />}
-            label="Auto Refresh"
-          />
-        </Box>
+        <Typography variant="h6" fontWeight="700" gutterBottom>Advanced Settings</Typography>
+        <Divider sx={{ mb: 3 }} />
+        <Typography variant="subtitle2" color="text.secondary" gutterBottom>Map Layers</Typography>
+        <FormControlLabel control={<Switch defaultChecked color="primary" />} label="3D Buildings" sx={{ mb: 1 }} />
+        <FormControlLabel control={<Switch defaultChecked color="primary" />} label="Street Names" sx={{ mb: 1 }} />
+        <FormControlLabel control={<Switch color="primary" />} label="Weather Radar" sx={{ mb: 3 }} />
+        <Typography variant="subtitle2" color="text.secondary" gutterBottom>System</Typography>
+        <FormControlLabel control={<Switch defaultChecked color="primary" />} label="High Performance Mode" sx={{ mb: 1 }} />
+        <FormControlLabel control={<Switch defaultChecked color="primary" />} label="Auto-refresh Data" />
       </Drawer>
-    </Container>
+
+      <Footer />
+    </Box>
   )
 }
 
