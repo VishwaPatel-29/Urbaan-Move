@@ -14,10 +14,9 @@
   <p>Streamlining employee transportation with real-time tracking, scheduling, and analytics</p>
 
   **[🎨 Figma Design](https://www.figma.com/file/your-link)** | 
-  **[🌐 Live Project](https://urbaanmovebyvishwa.vercel.app/)** | 
+  **[🌐 Live Project](https://urbanmove.vercel.app)** | 
   **[📄 API Documentation](https://documenter.getpostman.com/view/50839381/2sBXqKoLCy)** | 
-  **[🖥️ Backend Link](https://urbaanmove-backend.onrender.com/)** | 
-  **[🎥 Video Demo](https://youtube.com/your-link)**
+  **[🖥️ Backend Link](https://urbaanmove-backend.onrender.com/)**
 </div>
 
 ## 📖 Documentation
@@ -43,13 +42,17 @@ UrbanMove provides a comprehensive, tech-enabled corporate shuttle platform that
 
 ## 📱 Screenshots
 <div align="center">
-  <img src="https://via.placeholder.com/800x450?text=Landing+Page" alt="Landing Page" width="800">
+  <img src="screenshots/landing.png" alt="Landing Page" width="800">
   <br>
-  <p><i>Landing Page - Modern & Responsive</i></p>
+  <p><i>Landing Page - Modern & Responsive Corporate Shuttle Interface</i></p>
   
-  <img src="https://via.placeholder.com/800x450?text=Dashboard" alt="Dashboard" width="800">
+  <img src="screenshots/dashboard.png" alt="Dashboard" width="800">
   <br>
-  <p><i>User Dashboard - Real-time insights</i></p>
+  <p><i>Admin Dashboard - Real-time Analytics and Route Tracking</i></p>
+
+  <img src="screenshots/login.png" alt="Login Page" width="800">
+  <br>
+  <p><i>Secure Login - Unified Access for Employees and Drivers</i></p>
 </div>
 
 ## 🚀 Features
