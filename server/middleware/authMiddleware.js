@@ -15,7 +15,19 @@ const authMiddleware = async (req, res, next) => {
     const token = authHeader.split(' ')[1]
     const decoded = verifyToken(token)
     
-    const user = await User.findById(decoded.userId)
+    // Check for hardcoded demo users first
+    let user
+    if (decoded.userId === 'demo-employee-id' || decoded.userId === 'demo-driver-id' || decoded.userId === 'demo-admin-id') {
+      const role = decoded.userId.split('-')[1] // employee, driver, or admin
+      user = {
+        _id: decoded.userId,
+        role: role,
+        status: 'active',
+        name: `Demo ${role.charAt(0).toUpperCase() + role.slice(1)}`
+      }
+    } else {
+      user = await User.findById(decoded.userId)
+    }
     
     if (!user) {
       return res.status(401).json({

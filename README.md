@@ -6,12 +6,28 @@
   <img src="https://img.shields.io/badge/MongoDB-8.0.3-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB">
   <img src="https://img.shields.io/badge/Material%20UI-5.15.3-007FFF?style=for-the-badge&logo=mui&logoColor=white" alt="Material UI">
   <img src="https://img.shields.io/badge/Tailwind%20CSS-3.4.0-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS">
+  <img src="https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white" alt="Postman">
 </div>
 
 <div align="center">
   <h3>🌟 A modern corporate shuttle booking and management platform 🌟</h3>
   <p>Streamlining employee transportation with real-time tracking, scheduling, and analytics</p>
+
+  **[🎨 Figma Design](https://www.figma.com/file/your-link)** | 
+  **[🌐 Live Project](https://urbanmove.vercel.app)** | 
+  **[📄 API Documentation](https://documenter.getpostman.com/view/50839381/2sBXqKoLCy)** | 
+  **[🖥️ Backend Link](https://urbanmove-server.vercel.app)** | 
+  **[🎥 Video Demo](https://youtube.com/your-link)**
 </div>
+
+## 📖 Documentation
+- **[Live Postman API Docs](https://documenter.getpostman.com/view/50839381/2sBXqKoLCy)**: Interactive documentation for all API endpoints.
+
+## 📌 Problem Statement
+Commuting to large corporate hubs, IT parks, and business campuses is often a stressful and inefficient experience for employees. Public transport can be unreliable, and private vehicle use contributes to traffic congestion and environmental impact. Corporate shuttles often lack real-time tracking, transparent booking systems, and efficient route management, leading to wasted time and poor employee satisfaction.
+
+## 💡 Solution
+UrbanMove provides a comprehensive, tech-enabled corporate shuttle platform that bridges the gap between employees and reliable transportation. By offering real-time tracking, instant booking, and an intuitive dashboard for both users and admins, UrbanMove ensures a seamless commute. Features like GPS-integrated route optimization and multi-role management make it a robust solution for modern corporate needs.
 
 ## 📋 Table of Contents
 
@@ -24,6 +40,17 @@
 - [📱 Screenshots](#-screenshots)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
+
+## 📱 Screenshots
+<div align="center">
+  <img src="https://via.placeholder.com/800x450?text=Landing+Page" alt="Landing Page" width="800">
+  <br>
+  <p><i>Landing Page - Modern & Responsive</i></p>
+  
+  <img src="https://via.placeholder.com/800x450?text=Dashboard" alt="Dashboard" width="800">
+  <br>
+  <p><i>User Dashboard - Real-time insights</i></p>
+</div>
 
 ## 🚀 Features
 

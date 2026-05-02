@@ -9,12 +9,37 @@ const getRides = async (req, res) => {
       query.status = status
     }
     
-    const rides = await Ride.find(query)
+    let rides = await Ride.find(query)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(parseInt(limit))
     
-    const total = await Ride.countDocuments(query)
+    let total = await Ride.countDocuments(query)
+
+    // Fallback dummy data for presentation
+    if (rides.length === 0) {
+      rides = [
+        {
+          _id: 'dummy-ride-1',
+          pickup: 'Corporate Office A',
+          destination: 'Sector 62 Metro',
+          status: 'completed',
+          scheduledTime: new Date(),
+          passengers: 2,
+          notes: 'Regular commute'
+        },
+        {
+          _id: 'dummy-ride-2',
+          pickup: 'Downtown Hub',
+          destination: 'Business Park',
+          status: 'pending',
+          scheduledTime: new Date(Date.now() + 3600000),
+          passengers: 1,
+          notes: 'Urgent meeting'
+        }
+      ]
+      total = 2
+    }
     
     res.json({
       status: 'success',

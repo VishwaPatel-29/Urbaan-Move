@@ -37,6 +37,15 @@ app.use((req, res, next) => {
   next()
 })
 
+app.get('/', (req, res) => {
+  res.json({
+    message: "Welcome to UrbanMove API",
+    version: "1.0.0",
+    status: "Running",
+    documentation: "/api/health"
+  })
+})
+
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/rides', rideRoutes)

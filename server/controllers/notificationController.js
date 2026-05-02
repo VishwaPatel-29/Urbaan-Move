@@ -2,14 +2,37 @@ const Notification = require('../models/Notification')
 
 const getNotifications = async (req, res) => {
   try {
-    const notifications = await Notification.find({ user: req.userId })
+    let notifications = await Notification.find({ user: req.userId })
       .sort({ createdAt: -1 })
       .limit(50)
     
-    const unreadCount = await Notification.countDocuments({
+    let unreadCount = await Notification.countDocuments({
       user: req.userId,
       read: false,
     })
+
+    // Fallback dummy data
+    if (notifications.length === 0) {
+      notifications = [
+        {
+          _id: 'dummy-notif-1',
+          title: 'Ride Confirmed',
+          message: 'Your ride to Corporate Office A has been confirmed.',
+          type: 'info',
+          read: false,
+          createdAt: new Date()
+        },
+        {
+          _id: 'dummy-notif-2',
+          title: 'Welcome to UrbanMove',
+          message: 'Explore smart commutes with our corporate shuttle platform.',
+          type: 'success',
+          read: true,
+          createdAt: new Date(Date.now() - 86400000)
+        }
+      ]
+      unreadCount = 1
+    }
     
     res.json({
       status: 'success',

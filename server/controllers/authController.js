@@ -31,6 +31,7 @@ const demoUsers = {
 
 const login = async (req, res) => {
   try {
+    console.log('Login attempt received:', req.body)
     const { email, password } = req.body
     
     if (email === demoUsers.employee.email && password === demoUsers.employee.password) {

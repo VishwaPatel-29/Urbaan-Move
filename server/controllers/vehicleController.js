@@ -2,7 +2,30 @@ const Vehicle = require('../models/Vehicle')
 
 const getVehicles = async (req, res) => {
   try {
-    const vehicles = await Vehicle.find()
+    let vehicles = await Vehicle.find()
+    
+    // Fallback dummy data
+    if (vehicles.length === 0) {
+      vehicles = [
+        {
+          _id: 'dummy-veh-1',
+          name: 'Urban Shuttle 01',
+          type: 'Van',
+          capacity: 12,
+          status: 'active',
+          plateNumber: 'ABC-1234'
+        },
+        {
+          _id: 'dummy-veh-2',
+          name: 'Corporate Express',
+          type: 'Bus',
+          capacity: 30,
+          status: 'active',
+          plateNumber: 'XYZ-9876'
+        }
+      ]
+    }
+
     res.json({
       status: 'success',
       data: vehicles,
