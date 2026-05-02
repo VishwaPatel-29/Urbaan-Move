@@ -2,6 +2,8 @@ class GoogleAuthService {
   constructor() {
     this.clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '635959778305-2voe764joqc4l10n0l3chjnfkbgg0bup.apps.googleusercontent.com'
     this.isInitialized = false
+    console.log('UrbanMove Google Auth Client ID:', this.clientId)
+    console.log('UrbanMove Current Origin:', window.location.origin)
   }
 
   initGoogleAuth(customCallback) {
