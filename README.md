@@ -16,7 +16,8 @@
   **[🎨 Figma Design](https://www.figma.com/file/your-link)** | 
   **[🌐 Live Project](https://urbaanmovebyvishwa.vercel.app/)** | 
   **[📄 API Documentation](https://documenter.getpostman.com/view/50839381/2sBXqKoLCy)** | 
-  **[🖥️ Backend Link](https://urbaanmove-backend.onrender.com/)**
+  **[🖥️ Backend Link](https://urbaanmove-backend.onrender.com/)** |
+  **[🎥 Demo Video](https://youtu.be/cRTHCE5w_r4)**
 </div>
 
 ## 📖 Documentation
@@ -36,23 +37,17 @@ UrbanMove provides a comprehensive, tech-enabled corporate shuttle platform that
 - [🚦 Routes](#-routes)
 - [⚙️ Installation](#️-installation)
 - [🚀 Getting Started](#-getting-started)
-- [📱 Screenshots](#-screenshots)
+- [🎥 Demo Video](#-demo-video)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
 
-## 📱 Screenshots
+## 🎥 Demo Video
 <div align="center">
-  <img src="screenshots/landing.png" alt="Landing Page" width="800">
+  <a href="https://youtu.be/cRTHCE5w_r4">
+    <img src="https://img.youtube.com/vi/cRTHCE5w_r4/maxresdefault.jpg" alt="UrbanMove Demo Video" width="800">
+  </a>
   <br>
-  <p><i>Landing Page - Modern & Responsive Corporate Shuttle Interface</i></p>
-  
-  <img src="screenshots/dashboard.png" alt="Dashboard" width="800">
-  <br>
-  <p><i>Admin Dashboard - Real-time Analytics and Route Tracking</i></p>
-
-  <img src="screenshots/login.png" alt="Login Page" width="800">
-  <br>
-  <p><i>Secure Login - Unified Access for Employees and Drivers</i></p>
+  <p><i>Watch the complete walkthrough of the UrbanMove Platform</i></p>
 </div>
 
 ## 🚀 Features
@@ -386,10 +381,6 @@ Found a bug? Please report it by:
 2. Providing detailed description
 3. Including steps to reproduce
 4. Adding screenshots if applicable
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
