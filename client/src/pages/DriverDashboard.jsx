@@ -38,6 +38,7 @@ import toast from 'react-hot-toast'
 import { selectTheme } from '../features/uiSlice'
 import Navbar from '../components/Navbar'
 import LottieLoader from '../components/LottieLoader'
+import BackButton from '../components/BackButton'
 
 const DriverDashboard = () => {
   const theme = useSelector(selectTheme)
@@ -121,6 +122,7 @@ const DriverDashboard = () => {
         <Navbar />
 
         <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 }, py: 10 }}>
+          <BackButton />
           <Typography variant="h4" sx={{ mb: 4, fontWeight: 700 }}>
             Driver Dashboard
           </Typography>

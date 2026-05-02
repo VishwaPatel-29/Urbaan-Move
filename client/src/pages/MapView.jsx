@@ -54,6 +54,7 @@ import {
 
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BackButton from '../components/BackButton'
 import GoogleMapComponent from '../components/GoogleMapComponent'
 import GOOGLE_MAPS_CONFIG from '../utils/googleMapsConfig'
 
@@ -186,6 +187,7 @@ const MapView = () => {
 
       <Box sx={{ flexGrow: 1, pt: { xs: 10, md: 12 }, pb: 6, px: { xs: 2, md: 4 } }}>
         <Container maxWidth="xxl" disableGutters>
+          <BackButton />
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
             <Box>
               <Typography variant="h4" fontWeight="800" sx={{ letterSpacing: '-0.5px' }}>

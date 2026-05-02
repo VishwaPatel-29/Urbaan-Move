@@ -60,6 +60,7 @@ import {
 
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BackButton from '../components/BackButton'
 
 const Billing = () => {
   const [invoices, setInvoices] = useState([
@@ -215,6 +216,7 @@ const Billing = () => {
       <Navbar />
       <Box component="main" sx={{ flexGrow: 1, pt: '80px', pb: 4 }}>
         <Container maxWidth="xl">
+          <BackButton />
           <Typography variant="h4" gutterBottom fontWeight="bold">
             Billing & Invoices
           </Typography>

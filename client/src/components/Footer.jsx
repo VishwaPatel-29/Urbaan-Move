@@ -143,7 +143,7 @@ const Footer = () => {
                 <Link to="/dashboard" style={linkStyle}>
                   Dashboard
                 </Link>
-                <Link to="/booking" style={linkStyle}>
+                <Link to="/book" style={linkStyle}>
                   Book Ride
                 </Link>
                 <Link to="/rides" style={linkStyle}>

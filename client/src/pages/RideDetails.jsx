@@ -48,12 +48,14 @@ import {
   Message,
   CalendarToday,
   AttachMoney,
-  TrendingUp,
-  TrendingDown,
   CheckCircle,
   Info,
   Warning
 } from '@mui/icons-material'
+
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
+import BackButton from '../components/BackButton'
 
 const RideDetails = () => {
   const [ride] = useState({
@@ -142,6 +144,7 @@ const RideDetails = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
+      <BackButton />
       <Typography variant="h4" gutterBottom fontWeight="bold">
         Ride Details
       </Typography>

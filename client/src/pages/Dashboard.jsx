@@ -38,6 +38,7 @@ import { useAuth } from '../hooks/useAuth'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import LiveMap from '../components/LiveMap'
+import BackButton from '../components/BackButton'
 
 const Dashboard = () => {
   const navigate = useNavigate()
@@ -120,7 +121,7 @@ const Dashboard = () => {
       
       <Box sx={{ pt: { xs: '80px', md: '100px' }, pb: 8 }}>
         <Container maxWidth="xl">
-          
+          <BackButton />
           {/* Header Section */}
           <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
             <Box>

@@ -26,6 +26,7 @@ import { setSessionItem, getSessionItem, removeSessionItem } from '../utils/stor
 import Navbar from '../components/Navbar'
 import LottieLoader from '../components/LottieLoader'
 import LottieSuccess from '../components/LottieSuccess'
+import BackButton from '../components/BackButton'
 
 const steps = ['Pickup Location', 'Destination', 'Schedule', 'Confirm']
 
@@ -324,6 +325,7 @@ const Booking = () => {
         <Navbar />
 
         <Box sx={{ maxWidth: 800, mx: 'auto', px: 2, py: 10 }}>
+          <BackButton />
           <Typography variant="h3" sx={{ mb: 4, textAlign: 'center', fontWeight: 700 }}>
             Book a{' '}
             <Box

@@ -30,6 +30,7 @@ import {
 
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BackButton from '../components/BackButton'
 
 const ChangePassword = () => {
   const [currentStep, setCurrentStep] = useState(0)
@@ -155,6 +156,7 @@ const ChangePassword = () => {
       <Navbar />
       <Box component="main" sx={{ flexGrow: 1, pt: '80px', pb: 4 }}>
         <Container maxWidth="sm">
+          <BackButton />
           <Typography variant="h4" gutterBottom fontWeight="bold">
             Change Password
           </Typography>

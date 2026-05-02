@@ -142,17 +142,13 @@ const getMockResponse = (endpoint, options) => {
     }
   }
 
-  // Simulate network delay
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const response = mockResponses[endpoint]
-      if (typeof response === 'function') {
-        resolve(response(options))
-      } else {
-        resolve(response || { success: false, message: 'Endpoint not found' })
-      }
-    }, 500)
-  })
+  // No delay for "fast" experience
+  const response = mockResponses[endpoint]
+  if (typeof response === 'function') {
+    return response(options)
+  } else {
+    return response || { success: false, message: 'Endpoint not found' }
+  }
 }
 
 // Authentication service

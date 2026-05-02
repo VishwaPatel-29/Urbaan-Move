@@ -32,6 +32,7 @@ import {
 } from '@mui/icons-material'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BackButton from '../components/BackButton'
 
 const Settings = () => {
   const theme = useMuiTheme()
@@ -76,6 +77,7 @@ const Settings = () => {
 
         <Box sx={{ flexGrow: 1, pt: { xs: '80px', md: '100px' }, pb: 8 }}>
           <Container maxWidth="lg">
+            <BackButton />
             
             <Box sx={{ mb: 4 }}>
               <Typography variant="h4" sx={{ fontWeight: 800, color: theme.palette.text.primary, mb: 1, letterSpacing: '-0.5px' }}>

@@ -32,6 +32,7 @@ import {
 } from '@mui/icons-material'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BackButton from '../components/BackButton'
 
 const HelpPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -191,6 +192,7 @@ const HelpPage = () => {
         <Navbar />
 
         <Container maxWidth="lg" sx={{ py: 8 }}>
+          <BackButton />
           <Box sx={{ textAlign: 'center', mb: 8 }}>
             <Typography
               variant="h2"

@@ -43,6 +43,7 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import SkeletonLoader from '../components/SkeletonLoader'
 import EmptyState from '../components/EmptyState'
+import BackButton from '../components/BackButton'
 
 const Rides = () => {
   const theme = useMuiTheme()
@@ -53,6 +54,8 @@ const Rides = () => {
   const [rides, setRides] = useState([])
   const [selectedRide, setSelectedRide] = useState(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
+  const [reviewOpen, setReviewOpen] = useState(false)
+  const [reviewData, setReviewData] = useState({ rating: 5, comment: '' })
 
   useEffect(() => {
     const fetchRides = async () => {
@@ -73,6 +76,12 @@ const Rides = () => {
     toast.success('Ride cancelled successfully')
     setRides(rides.map(r => r._id === rideId ? { ...r, status: 'cancelled' } : r))
     setDetailsOpen(false)
+  }
+
+  const handleReviewSubmit = () => {
+    toast.success('Thank you for your feedback!')
+    setReviewOpen(false)
+    setReviewData({ rating: 5, comment: '' })
   }
 
   const getStatusColor = (status) => {
@@ -151,6 +160,7 @@ const Rides = () => {
 
       <Box sx={{ pt: { xs: '80px', md: '100px' }, pb: 8 }}>
         <Container maxWidth="xl">
+          <BackButton />
           
           {/* Header */}
           <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
@@ -389,6 +399,7 @@ const Rides = () => {
                   <Button
                     variant="outlined"
                     startIcon={<RateReview />}
+                    onClick={() => setReviewOpen(true)}
                     sx={{ color: '#00B4B4', borderColor: 'rgba(0, 180, 180, 0.5)', mr: 'auto', borderRadius: '8px', textTransform: 'none', fontWeight: 600 }}
                   >
                     Leave Review
@@ -399,6 +410,77 @@ const Rides = () => {
             </>
           )
         })()}
+      </Dialog>
+
+      {/* Review Dialog */}
+      <Dialog
+        open={reviewOpen}
+        onClose={() => setReviewOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: '16px',
+            backgroundColor: theme.palette.background.paper,
+          }
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 700 }}>Rate your ride</DialogTitle>
+        <DialogContent>
+          <Box sx={{ py: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <Typography variant="body1" sx={{ textAlign: 'center', color: theme.palette.text.secondary }}>
+              How was your experience with {selectedRide?.driver || 'your driver'} on {selectedRide?.vehicle || 'this vehicle'}?
+            </Typography>
+            
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <IconButton 
+                  key={star} 
+                  onClick={() => setReviewData({ ...reviewData, rating: star })}
+                  sx={{ color: star <= reviewData.rating ? '#FFD700' : theme.palette.action.disabled }}
+                >
+                  <RateReview />
+                </IconButton>
+              ))}
+            </Box>
+
+            <Box 
+              component="textarea" 
+              placeholder="Tell us more about your ride (optional)..."
+              value={reviewData.comment}
+              onChange={(e) => setReviewData({ ...reviewData, comment: e.target.value })}
+              sx={{ 
+                width: '100%', 
+                minHeight: '100px', 
+                borderRadius: '8px', 
+                p: 2, 
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#fff',
+                color: theme.palette.text.primary,
+                fontFamily: 'inherit',
+                outline: 'none',
+                '&:focus': { borderColor: '#00B4B4' }
+              }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 0 }}>
+          <Button onClick={() => setReviewOpen(false)} sx={{ color: theme.palette.text.secondary }}>Cancel</Button>
+          <Button 
+            variant="contained" 
+            onClick={handleReviewSubmit}
+            sx={{ 
+              borderRadius: '8px', 
+              backgroundColor: '#00B4B4', 
+              '&:hover': { backgroundColor: '#008080' },
+              textTransform: 'none',
+              fontWeight: 600,
+              boxShadow: 'none'
+            }}
+          >
+            Submit Review
+          </Button>
+        </DialogActions>
       </Dialog>
       
       <Footer />

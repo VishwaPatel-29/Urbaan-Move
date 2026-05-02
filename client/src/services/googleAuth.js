@@ -1,45 +1,65 @@
 class GoogleAuthService {
   constructor() {
-    this.clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'
+    this.clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '635959778305-2voe764joqc4l10n0l3chjnfkbgg0bup.apps.googleusercontent.com'
     this.isInitialized = false
   }
 
-  initGoogleAuth() {
+  initGoogleAuth(customCallback) {
     return new Promise((resolve, reject) => {
-      if (this.isInitialized) {
+      if (!this.clientId || this.clientId.includes('your_google_client_id')) {
+        console.warn('Google Client ID not configured properly in .env')
+        reject(new Error('Google Client ID not configured'))
+        return
+      }
+
+      if (this.isInitialized && !customCallback) {
         resolve()
         return
       }
 
+      const callback = customCallback || this.handleCredentialResponse.bind(this)
+
       if (window.google && window.google.accounts) {
-        window.google.accounts.id.initialize({
-          client_id: this.clientId,
-          callback: this.handleCredentialResponse.bind(this),
-          auto_select: false,
-          cancel_on_tap_outside: false,
-        })
-        this.isInitialized = true
-        resolve()
+        try {
+          window.google.accounts.id.initialize({
+            client_id: this.clientId,
+            callback: callback,
+            auto_select: false,
+            cancel_on_tap_outside: false,
+          })
+          this.isInitialized = true
+          resolve()
+        } catch (error) {
+          console.error('Error initializing Google accounts:', error)
+          reject(error)
+        }
       } else {
         // Wait for Google script to load
         const checkGoogle = setInterval(() => {
           if (window.google && window.google.accounts) {
             clearInterval(checkGoogle)
-            window.google.accounts.id.initialize({
-              client_id: this.clientId,
-              callback: this.handleCredentialResponse.bind(this),
-              auto_select: false,
-              cancel_on_tap_outside: false,
-            })
-            this.isInitialized = true
-            resolve()
+            try {
+              window.google.accounts.id.initialize({
+                client_id: this.clientId,
+                callback: callback,
+                auto_select: false,
+                cancel_on_tap_outside: false,
+              })
+              this.isInitialized = true
+              resolve()
+            } catch (error) {
+              console.error('Error initializing Google accounts after script load:', error)
+              reject(error)
+            }
           }
-        }, 100)
+        }, 10)
 
         // Timeout after 10 seconds
         setTimeout(() => {
           clearInterval(checkGoogle)
-          reject(new Error('Google Auth script failed to load'))
+          if (!this.isInitialized) {
+            reject(new Error('Google Auth script failed to load or initialize'))
+          }
         }, 10000)
       }
     })
@@ -54,11 +74,24 @@ class GoogleAuthService {
         this.signInResolve = resolve
         this.signInReject = reject
 
-        // Show the Google Sign-In popup
+        // Show the Google Sign-In prompt (One Tap)
         window.google.accounts.id.prompt((notification) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            // Fallback to popup if prompt doesn't work
-            this.signInWithPopup()
+          if (notification.isNotDisplayed()) {
+            const reason = notification.getNotDisplayedReason()
+            console.log('One Tap is not displayed:', reason)
+            
+            // If the reason is 'origin_not_allowed', it's a configuration issue
+            if (reason === 'origin_not_allowed') {
+              reject(new Error('Access Blocked: This origin (http://localhost:3000) is not registered in Google Cloud Console.'))
+            } else {
+              reject(new Error(`Google account selection not available: ${reason}`))
+            }
+          } else if (notification.isSkippedMoment()) {
+            console.log('One Tap skipped:', notification.getSkippedReason())
+            reject(new Error('Sign-in skipped.'))
+          } else if (notification.isDismissedMoment()) {
+            console.log('One Tap dismissed:', notification.getDismissedReason())
+            reject(new Error('Sign-in dismissed.'))
           }
         })
       })
@@ -68,22 +101,32 @@ class GoogleAuthService {
     }
   }
 
-  signInWithPopup() {
+  renderButton(elementId, options = {}) {
     try {
+      if (!this.isInitialized) {
+        console.warn('Google Auth not initialized. Call initGoogleAuth first.')
+        return
+      }
+      
+      const element = document.getElementById(elementId)
+      if (!element) {
+        console.warn(`Element with ID ${elementId} not found`)
+        return
+      }
+
       window.google.accounts.id.renderButton(
-        document.getElementById('google-signin-button'),
+        element,
         {
-          theme: 'filled_blue',
-          size: 'large',
-          text: 'continue_with',
-          shape: 'rectangular',
+          theme: options.theme || 'outline',
+          size: options.size || 'large',
+          text: options.text || 'continue_with',
+          shape: options.shape || 'rectangular',
+          width: options.width || '100%',
+          logo_alignment: options.logo_alignment || 'left',
         }
       )
     } catch (error) {
-      console.error('Google popup error:', error)
-      if (this.signInReject) {
-        this.signInReject(error)
-      }
+      console.error('Google renderButton error:', error)
     }
   }
 
@@ -132,9 +175,8 @@ class GoogleAuthService {
 
   // For development/demo purposes - mock Google auth
   async mockSignIn() {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
+    console.log('Using Mock Google Sign-In')
+    // No delay for "fast" experience
     return {
       googleId: '123456789',
       email: 'demo.user@gmail.com',

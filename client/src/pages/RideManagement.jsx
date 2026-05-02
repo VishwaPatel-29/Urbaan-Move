@@ -62,6 +62,7 @@ import {
 
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BackButton from '../components/BackButton'
 
 const RideManagement = () => {
   const [rides, setRides] = useState([
@@ -209,6 +210,7 @@ const RideManagement = () => {
       <Navbar />
       <Box component="main" sx={{ flexGrow: 1, pt: '80px', pb: 4 }}>
         <Container maxWidth="xl">
+          <BackButton />
           <Typography variant="h4" gutterBottom fontWeight="bold">
             Ride Management
           </Typography>

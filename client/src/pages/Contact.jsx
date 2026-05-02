@@ -34,6 +34,7 @@ import {
 } from '@mui/icons-material'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BackButton from '../components/BackButton'
 
 const Contact = () => {
   const theme = useMuiTheme()
@@ -172,6 +173,7 @@ const Contact = () => {
       }} />
 
       <Container maxWidth="xl" sx={{ pt: { xs: '120px', md: '160px' }, pb: 12, position: 'relative', zIndex: 1 }}>
+        <BackButton />
         <Grid container spacing={6}>
           {/* Left Column: Info & Links */}
           <Grid item xs={12} lg={5}>

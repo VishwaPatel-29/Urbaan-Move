@@ -59,6 +59,7 @@ import {
 import { adminService } from '../services/api'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BackButton from '../components/BackButton'
 import toast from 'react-hot-toast'
 
 const AdminDashboard = () => {
@@ -364,6 +365,7 @@ const AdminDashboard = () => {
         {/* Main Content with proper spacing for fixed navbar */}
         <Box sx={{ pt: '64px' }}>
           <Container maxWidth="xl">
+            <BackButton />
             {/* Header */}
             <Box sx={{ 
               display: 'flex', 

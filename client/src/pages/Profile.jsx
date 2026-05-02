@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
+import { Link } from 'react-router-dom'
 import {
   Box,
   Typography,
@@ -36,6 +37,7 @@ import { selectUser, setUser } from '../features/authSlice'
 import { validateName, validatePhone } from '../utils/validators'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BackButton from '../components/BackButton'
 
 const Profile = () => {
   const dispatch = useDispatch()
@@ -148,6 +150,7 @@ const Profile = () => {
 
         <Box sx={{ flexGrow: 1, pt: { xs: '80px', md: '100px' }, pb: 8 }}>
           <Container maxWidth="lg">
+            <BackButton />
             
             <Box sx={{ mb: 4 }}>
               <Typography variant="h4" sx={{ fontWeight: 800, color: theme.palette.text.primary, mb: 1, letterSpacing: '-0.5px' }}>
@@ -239,6 +242,8 @@ const Profile = () => {
                     </Typography>
                     <Button
                       fullWidth
+                      component={Link}
+                      to="/rides"
                       startIcon={<History />}
                       sx={{ justifyContent: 'flex-start', color: theme.palette.text.primary, py: 1.5, textTransform: 'none', fontWeight: 500 }}
                     >
@@ -246,6 +251,8 @@ const Profile = () => {
                     </Button>
                     <Button
                       fullWidth
+                      component={Link}
+                      to="/billing"
                       startIcon={<Business />}
                       sx={{ justifyContent: 'flex-start', color: theme.palette.text.primary, py: 1.5, textTransform: 'none', fontWeight: 500 }}
                     >

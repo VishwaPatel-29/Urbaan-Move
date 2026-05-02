@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import {
@@ -35,6 +35,7 @@ import toast from 'react-hot-toast'
 import { setCredentials, setError, setLoading, selectAuthLoading, selectAuthError } from '../features/authSlice'
 import { authService } from '../services/api'
 import googleAuthService from '../services/googleAuth'
+import BackButton from '../components/BackButton'
 
 const loginSchema = Yup.object().shape({
   name: Yup.string().min(2, 'Name is too short').required('Name is required'),
@@ -54,11 +55,84 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
 
-  const handleGoogleLogin = async (formName) => {
+  // This handles the callback from the rendered Google button
+  const handleGoogleCredentialResponse = async (response) => {
     try {
       setGoogleLoading(true)
       toast.loading('Connecting to Google...', { id: 'google-auth' })
-      const userData = await googleAuthService.mockSignIn()
+      
+      // Decode the JWT token
+      const userData = googleAuthService.decodeJwtToken(response.credential)
+      
+      const apiResponse = await authService.googleLogin({
+        email: userData.email,
+        name: userData.name,
+        googleId: userData.sub,
+        profilePicture: userData.picture,
+      })
+      
+      const { user, token } = apiResponse.data
+      dispatch(setCredentials({ user, token }))
+      
+      toast.success(`Welcome back, ${user.name}!`, { id: 'google-auth' })
+      
+      setTimeout(() => {
+        navigate('/dashboard')
+      }, 100)
+    } catch (err) {
+      console.error('Google login error:', err)
+      toast.error('Google login failed', { id: 'google-auth' })
+    } finally {
+      setGoogleLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    const initGoogle = async () => {
+      try {
+        await googleAuthService.initGoogleAuth(handleGoogleCredentialResponse)
+        // Wait a bit for the DOM to be ready
+        setTimeout(() => {
+          googleAuthService.renderButton('google-button-container', {
+            theme: isDark ? 'filled_black' : 'outline',
+            size: 'large',
+            width: '440px', // Matches the maxWidth of the form container
+          })
+        }, 500)
+      } catch (err) {
+        console.error('Failed to init Google Auth:', err)
+      }
+    }
+    initGoogle()
+  }, [isDark])
+
+
+  const handleGoogleLogin = async (formName) => {
+    // This is now handled by the rendered button, but we keep this
+    // as a fallback or for triggering One Tap manually
+    try {
+      setGoogleLoading(true)
+      toast.loading('Connecting to Google...', { id: 'google-auth' })
+      
+      let userData;
+      try {
+        userData = await googleAuthService.signIn()
+      } catch (signInErr) {
+        // If it's an origin error, offer mock login in development
+        if (signInErr.message.includes('origin') || signInErr.message.includes('Access Blocked')) {
+          console.warn('Real Google Auth failed due to origin. Offering mock fallback.')
+          const useMock = window.confirm(
+            `${signInErr.message}\n\nWould you like to use a Mock Login for development purposes?`
+          )
+          if (useMock) {
+            userData = await googleAuthService.mockSignIn()
+          } else {
+            throw signInErr
+          }
+        } else {
+          throw signInErr
+        }
+      }
       
       const response = await authService.googleLogin({
         email: userData.email,
@@ -74,10 +148,15 @@ const Login = () => {
       
       setTimeout(() => {
         navigate('/dashboard')
-      }, 800)
+      }, 100)
     } catch (err) {
       console.error('Google login error:', err)
-      toast.error('Google login failed', { id: 'google-auth' })
+      // If One Tap fails, we don't want to show an error if they can still use the button
+      if (err.message !== 'Sign-in dismissed.' && err.message !== 'Sign-in skipped.') {
+        toast.error(err.message || 'Google login failed', { id: 'google-auth' })
+      } else {
+        toast.dismiss('google-auth')
+      }
     } finally {
       setGoogleLoading(false)
     }
@@ -101,7 +180,7 @@ const Login = () => {
         } else {
           navigate('/dashboard')
         }
-      }, 800)
+      }, 100)
     } catch (err) {
       const message = err.response?.data?.message || err.message || 'Login failed'
       dispatch(setError(message))
@@ -184,6 +263,7 @@ const Login = () => {
             overflowY: 'auto'
           }}>
             <Box sx={{ width: '100%', maxWidth: '440px' }}>
+              <BackButton />
               
               <Box sx={{ mb: 2, display: { xs: 'block', md: 'none' }, textAlign: 'center' }}>
                 <RocketLaunch sx={{ color: '#00B4B4', fontSize: 40, mb: 2 }} />
@@ -400,27 +480,64 @@ const Login = () => {
                         <Divider sx={{ flex: 1, borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)' }} />
                       </Box>
 
-                      <Button
-                        fullWidth
-                        variant="outlined"
-                        startIcon={googleLoading ? <CircularProgress size={20} color="inherit" /> : <Google />}
-                        onClick={() => handleGoogleLogin(values.name)}
-                        disabled={googleLoading || loading}
-                        sx={{ 
-                          py: 1.2, 
-                          borderRadius: '8px',
-                          borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', 
-                          color: theme.palette.text.primary, 
-                          fontWeight: 600,
-                          textTransform: 'none',
-                          '&:hover': { 
-                            backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
-                            borderColor: theme.palette.text.primary
-                          },
-                        }}
-                      >
-                        {googleLoading ? 'Connecting...' : 'Continue with Google'}
-                      </Button>
+                       <Box sx={{ position: 'relative', width: '100%' }}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          startIcon={googleLoading ? <CircularProgress size={20} color="inherit" /> : <Google />}
+                          onClick={() => handleGoogleLogin(values.name)}
+                          disabled={googleLoading || loading}
+                          sx={{ 
+                            py: 1.2, 
+                            borderRadius: '8px',
+                            borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', 
+                            color: theme.palette.text.primary, 
+                            fontWeight: 600,
+                            textTransform: 'none',
+                            '&:hover': { 
+                              backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                              borderColor: theme.palette.text.primary
+                            },
+                          }}
+                        >
+                          {googleLoading ? 'Connecting...' : 'Continue with Google'}
+                        </Button>
+                        
+                        {/* Real Google Button Overlay (Hidden but clickable) */}
+                        <Box 
+                          id="google-button-container" 
+                          sx={{ 
+                            position: 'absolute', 
+                            top: 0, 
+                            left: 0, 
+                            width: '100%', 
+                            height: '100%', 
+                            opacity: 0, 
+                            zIndex: 2,
+                            '& > div': { width: '100% !important', height: '100% !important' },
+                            '& iframe': { width: '100% !important', height: '100% !important' }
+                          }} 
+                        />
+                        {/* Dev/Mock Fallback */}
+                        {(import.meta.env.MODE === 'development' || true) && (
+                          <Box sx={{ mt: 1, textAlign: 'center' }}>
+                            <Button 
+                              variant="text" 
+                              size="small"
+                              onClick={() => handleGoogleLogin(values.name || 'Demo User')}
+                              sx={{ 
+                                color: '#00B4B4', 
+                                textTransform: 'none', 
+                                fontSize: '0.75rem',
+                                fontWeight: 600,
+                                '&:hover': { background: 'transparent', textDecoration: 'underline' }
+                              }}
+                            >
+                              Trouble with Google? Use Mock Login
+                            </Button>
+                          </Box>
+                        )}
+                      </Box>
                     </Form>
                   )}
                 </Formik>

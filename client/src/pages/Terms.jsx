@@ -20,6 +20,7 @@ import {
 } from '@mui/icons-material'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BackButton from '../components/BackButton'
 
 const Terms = () => {
   const termsSections = [
@@ -123,6 +124,7 @@ const Terms = () => {
         <Navbar />
 
         <Container maxWidth="lg" sx={{ py: 8 }}>
+          <BackButton />
           <Box sx={{ textAlign: 'center', mb: 8 }}>
             <Typography
               variant="h2"

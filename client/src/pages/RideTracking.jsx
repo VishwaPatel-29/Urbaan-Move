@@ -40,8 +40,10 @@ import {
   Refresh,
   Cancel,
   CheckCircle,
-  Info
+  Info,
+  Warning as Emergency
 } from '@mui/icons-material'
+import BackButton from '../components/BackButton'
 
 const RideTracking = () => {
   const [rideStatus, setRideStatus] = useState('active') // 'searching', 'confirmed', 'arriving', 'active', 'completed'
@@ -163,6 +165,7 @@ const RideTracking = () => {
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
+      <BackButton />
       <Typography variant="h4" gutterBottom fontWeight="bold">
         Ride Tracking
       </Typography>
