@@ -43,9 +43,6 @@ UrbanMove provides a comprehensive, tech-enabled corporate shuttle platform that
 
 ## 🎥 Demo Video
 <div align="center">
-  <a href="https://youtu.be/cRTHCE5w_r4">
-    <img src="https://img.youtube.com/vi/cRTHCE5w_r4/maxresdefault.jpg" alt="UrbanMove Demo Video" width="800">
-  </a>
   <br>
   <p><i>Watch the complete walkthrough of the UrbanMove Platform</i></p>
 </div>
