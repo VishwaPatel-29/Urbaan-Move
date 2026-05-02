@@ -37,15 +37,8 @@ UrbanMove provides a comprehensive, tech-enabled corporate shuttle platform that
 - [🚦 Routes](#-routes)
 - [⚙️ Installation](#️-installation)
 - [🚀 Getting Started](#-getting-started)
-- [🎥 Demo Video](#-demo-video)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
-
-## 🎥 Demo Video
-<div align="center">
-  <br>
-  <p><i>Watch the complete walkthrough of the UrbanMove Platform</i></p>
-</div>
 
 ## 🚀 Features
 
