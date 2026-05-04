@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import logoSrc from '/logo.svg'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
   AppBar,
@@ -222,7 +221,7 @@ const Navbar = () => {
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Box
                 component="img"
-                src={logoSrc}
+                src="/logo.svg"
                 alt="UrbanMove"
                 sx={{
                   height: 48,
