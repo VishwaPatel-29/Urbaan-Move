@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import logoSrc from '/logo.svg'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
   AppBar,
@@ -217,43 +218,18 @@ const Navbar = () => {
               '&:hover': { opacity: 0.8 }
             }}
           >
-            {/* Inline SVG logo - always renders, no file serving dependency */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="navLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#00B4B4" />
-                    <stop offset="100%" stopColor="#008080" />
-                  </linearGradient>
-                </defs>
-                {/* Bus Body */}
-                <rect x="4" y="14" width="32" height="18" rx="4" fill="url(#navLogoGrad)" />
-                {/* Windows */}
-                <rect x="7" y="18" width="6" height="5" rx="1.5" fill="white" opacity="0.95" />
-                <rect x="16" y="18" width="6" height="5" rx="1.5" fill="white" opacity="0.95" />
-                <rect x="25" y="18" width="6" height="5" rx="1.5" fill="white" opacity="0.95" />
-                {/* Wheels */}
-                <circle cx="12" cy="34" r="3" fill="#005f5f" />
-                <circle cx="28" cy="34" r="3" fill="#005f5f" />
-                {/* Door */}
-                <rect x="30" y="20" width="4" height="9" rx="1" fill="white" opacity="0.8" />
-                {/* Roof accent */}
-                <rect x="8" y="11" width="24" height="4" rx="2" fill="url(#navLogoGrad)" opacity="0.5" />
-              </svg>
-              <Typography
-                variant="h6"
+            {/* Logo image imported via Vite - bundled into build output */}
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Box
+                component="img"
+                src={logoSrc}
+                alt="UrbanMove"
                 sx={{
-                  fontWeight: 800,
-                  background: 'linear-gradient(135deg, #00B4B4 0%, #008080 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  letterSpacing: '-0.5px',
-                  fontSize: { xs: '1.2rem', sm: '1.4rem' },
+                  height: 48,
+                  width: 'auto',
+                  filter: isDark ? 'brightness(1.3)' : 'none',
                 }}
-              >
-                UrbanMove
-              </Typography>
+              />
             </Box>
           </Box>
 
