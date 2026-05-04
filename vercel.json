@@ -14,12 +14,29 @@
     }
   ],
   "rewrites": [
-    { "source": "/api/:path*", "destination": "/server/server.js" },
-    { "source": "/assets/:path*", "destination": "/client/assets/:path*" },
-    { "source": "/favicon.svg", "destination": "/client/favicon.svg" },
-    { "source": "/logo.svg", "destination": "/client/logo.svg" },
-    { "source": "/sitemap.xml", "destination": "/client/sitemap.xml" },
-    { "source": "/og-image.png", "destination": "/client/og-image.png" },
-    { "source": "/:path*", "destination": "/client/index.html" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/server/server.js"
+    },
+    {
+      "source": "/assets/(.*)",
+      "destination": "/client/assets/$1"
+    },
+    {
+      "source": "/favicon.svg",
+      "destination": "/client/favicon.svg"
+    },
+    {
+      "source": "/logo.svg",
+      "destination": "/client/logo.svg"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/client/sitemap.xml"
+    },
+    {
+      "source": "/((?!api|assets|favicon\\.svg|logo\\.svg|sitemap\\.xml).*)",
+      "destination": "/client/index.html"
+    }
   ]
 }
