@@ -15,42 +15,16 @@
 
   **[🎨 Figma Design](https://www.figma.com/file/your-link)** | 
   **[🌐 Live Project](https://urbanmove.vercel.app)** | 
-  **[📄 API Documentation](https://documenter.getpostman.com/view/50839381/2sBXqKoLCy)** | 
-  **[🖥️ Backend Link](https://urbanmove-server.vercel.app)** | 
-  **[🎥 Video Demo](https://youtube.com/your-link)**
+  **[📄 Postman Documentation](https://documenter.getpostman.com/view/50839381/2sBXqKoLCy)** | 
+  **[🖥️ Backend Link](https://urbaanmove-backend.onrender.com/)** | 
+  **[🎥 YouTube Demo](https://youtu.be/cRTHCE5w_r4)**
 </div>
-
-## 📖 Documentation
-- **[Live Postman API Docs](https://documenter.getpostman.com/view/50839381/2sBXqKoLCy)**: Interactive documentation for all API endpoints.
 
 ## 📌 Problem Statement
 Commuting to large corporate hubs, IT parks, and business campuses is often a stressful and inefficient experience for employees. Public transport can be unreliable, and private vehicle use contributes to traffic congestion and environmental impact. Corporate shuttles often lack real-time tracking, transparent booking systems, and efficient route management, leading to wasted time and poor employee satisfaction.
 
 ## 💡 Solution
 UrbanMove provides a comprehensive, tech-enabled corporate shuttle platform that bridges the gap between employees and reliable transportation. By offering real-time tracking, instant booking, and an intuitive dashboard for both users and admins, UrbanMove ensures a seamless commute. Features like GPS-integrated route optimization and multi-role management make it a robust solution for modern corporate needs.
-
-## 📋 Table of Contents
-
-- [🚀 Features](#-features)
-- [🛠️ Tech Stack](#️-tech-stack)
-- [🏗️ Project Structure](#️-project-structure)
-- [🚦 Routes](#-routes)
-- [⚙️ Installation](#️-installation)
-- [🚀 Getting Started](#-getting-started)
-- [📱 Screenshots](#-screenshots)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
-
-## 📱 Screenshots
-<div align="center">
-  <img src="https://via.placeholder.com/800x450?text=Landing+Page" alt="Landing Page" width="800">
-  <br>
-  <p><i>Landing Page - Modern & Responsive</i></p>
-  
-  <img src="https://via.placeholder.com/800x450?text=Dashboard" alt="Dashboard" width="800">
-  <br>
-  <p><i>User Dashboard - Real-time insights</i></p>
-</div>
 
 ## 🚀 Features
 
@@ -111,7 +85,7 @@ Prettier 3.1.1        💅  Code Formatting
 Nodemon 3.0.2         🔄  Auto-restart
 ```
 
-## 🏗️ Project Structure
+## 🏗️ Proper Folder Structure
 
 ```
 UrbanMove/
@@ -137,6 +111,33 @@ UrbanMove/
 ├── 📄 README.md
 └── 📄 .gitignore
 ```
+
+## 📱 Project Screenshots/Images
+<div align="center">
+  <img src="screenshots/landing.png" alt="Landing Page" width="800">
+  <br>
+  <p><i>Landing Page - Modern & Responsive Corporate Shuttle Interface</i></p>
+  
+  <img src="screenshots/dashboard.png" alt="Dashboard" width="800">
+  <br>
+  <p><i>Admin Dashboard - Real-time Analytics and Route Tracking</i></p>
+
+  <img src="screenshots/login.png" alt="Login Page" width="800">
+  <br>
+  <p><i>Secure Login - Unified Access for Employees and Drivers</i></p>
+</div>
+
+## 📋 Table of Contents
+
+- [🚀 Features](#-features)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [🏗️ Proper Folder Structure](#️-proper-folder-structure)
+- [📱 Project Screenshots/Images](#-project-screenshotsimages)
+- [🚦 Routes](#-routes)
+- [⚙️ Installation](#️-installation)
+- [🚀 Getting Started](#-getting-started)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
 
 ## 🚦 Routes
 

@@ -31,7 +31,6 @@ export const removeItem = (key) => {
 export const clearAll = () => {
   try {
     localStorage.removeItem('urbanmove-user')
-    localStorage.removeItem('urbanmove-token')
     localStorage.removeItem('urbanmove-theme')
     localStorage.removeItem('urbanmove-booking-step')
     localStorage.removeItem('urbanmove-filters')

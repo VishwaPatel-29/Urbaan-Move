@@ -219,7 +219,7 @@ const Navbar = () => {
           >
             <Box
               component="img"
-              src={import.meta.env.BASE_URL + "logo.svg"}
+              src="/logo.svg"
               alt="UrbanMove"
               sx={{
                 height: 48,

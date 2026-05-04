@@ -3,10 +3,8 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://urbanmove-server.u
 
 // API headers configuration
 const getHeaders = (options = {}) => {
-  const token = localStorage.getItem('urbanmove-token')
   const defaultHeaders = {
     'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
   }
   return { ...defaultHeaders, ...options.headers }
 }
@@ -27,6 +25,7 @@ const apiRequest = async (endpoint, options = {}, retries = 3, backoff = 1000) =
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
         headers: getHeaders(options),
+        credentials: 'include',
       })
 
       // Response Interceptor Logic
@@ -89,8 +88,7 @@ const getMockResponse = (endpoint, options) => {
               phone: '+1234567890',
               company: 'TechCorp Inc.',
               avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00B4B4&color=fff`
-            },
-            token: 'mock-jwt-token-123456789'
+            }
           },
           message: 'Login successful'
         }
@@ -120,8 +118,7 @@ const getMockResponse = (endpoint, options) => {
               phone: '+1234567890',
               company: 'Google Corp',
               avatar: requestBody.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00B4B4&color=fff`
-            },
-            token: 'mock-google-jwt-token'
+            }
           },
           message: 'Google login successful'
         }
@@ -131,10 +128,7 @@ const getMockResponse = (endpoint, options) => {
     },
 
     '/auth/refresh': {
-      success: true,
-      data: {
-        token: 'mock-refreshed-jwt-token-123456789'
-      }
+      success: true
     },
     '/auth/logout': {
       success: true,

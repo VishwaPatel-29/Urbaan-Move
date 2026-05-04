@@ -3,16 +3,22 @@ const User = require('../models/User')
 
 const authMiddleware = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization
+    let token = req.cookies.token
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
+      const authHeader = req.headers.authorization
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1]
+      }
+    }
+
+    if (!token) {
       return res.status(401).json({
         status: 'error',
         message: 'No token provided',
       })
     }
 
-    const token = authHeader.split(' ')[1]
     const decoded = verifyToken(token)
     
     // Check for hardcoded demo users first

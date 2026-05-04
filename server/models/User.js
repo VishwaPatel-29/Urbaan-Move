@@ -60,6 +60,10 @@ const userSchema = new mongoose.Schema({
   lastLogin: {
     type: Date,
   },
+  refreshToken: {
+    type: String,
+    select: false,
+  },
   loginHistory: [{
     date: Date,
     ip: String,

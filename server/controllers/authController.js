@@ -29,6 +29,24 @@ const demoUsers = {
   },
 }
 
+const setCookies = (res, token, refreshToken = null) => {
+  const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 24 * 60 * 60 * 1000 // 1 day
+  }
+  res.cookie('token', token, cookieOptions)
+  
+  if (refreshToken) {
+    const refreshOptions = {
+      ...cookieOptions,
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    }
+    res.cookie('refreshToken', refreshToken, refreshOptions)
+  }
+}
+
 const login = async (req, res) => {
   try {
     console.log('Login attempt received:', req.body)
@@ -38,9 +56,10 @@ const login = async (req, res) => {
       const user = { ...demoUsers.employee, _id: 'demo-employee-id', status: 'active' }
       delete user.password
       const token = generateToken(user._id, user.role)
+      setCookies(res, token)
       return res.json({
         status: 'success',
-        data: { user, token },
+        data: { user },
       })
     }
     
@@ -48,9 +67,10 @@ const login = async (req, res) => {
       const user = { ...demoUsers.driver, _id: 'demo-driver-id', status: 'active' }
       delete user.password
       const token = generateToken(user._id, user.role)
+      setCookies(res, token)
       return res.json({
         status: 'success',
-        data: { user, token },
+        data: { user },
       })
     }
     
@@ -58,9 +78,10 @@ const login = async (req, res) => {
       const user = { ...demoUsers.admin, _id: 'demo-admin-id', status: 'active' }
       delete user.password
       const token = generateToken(user._id, user.role)
+      setCookies(res, token)
       return res.json({
         status: 'success',
-        data: { user, token },
+        data: { user },
       })
     }
     
@@ -86,12 +107,15 @@ const login = async (req, res) => {
     const token = generateToken(user._id, user.role)
     const refreshToken = generateRefreshToken(user._id)
     
+    user.refreshToken = refreshToken
+    await user.save()
+    
+    setCookies(res, token, refreshToken)
+    
     res.json({
       status: 'success',
       data: {
         user,
-        token,
-        refreshToken,
       },
     })
   } catch (error) {
@@ -106,6 +130,17 @@ const login = async (req, res) => {
 
 
 const logout = async (req, res) => {
+  res.clearCookie('token')
+  res.clearCookie('refreshToken')
+  
+  if (req.userId && !req.userId.startsWith('demo-')) {
+    try {
+      await User.findByIdAndUpdate(req.userId, { $unset: { refreshToken: 1 } })
+    } catch (err) {
+      console.error('Error clearing refresh token on logout:', err)
+    }
+  }
+
   res.json({
     status: 'success',
     message: 'Logged out successfully',
@@ -114,7 +149,7 @@ const logout = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   try {
-    const { refreshToken: token } = req.body
+    const token = req.cookies.refreshToken || req.body.refreshToken
     if (!token) {
       return res.status(400).json({
         status: 'error',
@@ -124,7 +159,7 @@ const refreshToken = async (req, res) => {
     
     const { verifyToken } = require('../utils/jwtUtils')
     const decoded = verifyToken(token)
-    const user = await User.findById(decoded.userId)
+    const user = await User.findOne({ _id: decoded.userId, refreshToken: token })
     
     if (!user) {
       return res.status(401).json({
@@ -134,10 +169,11 @@ const refreshToken = async (req, res) => {
     }
     
     const newToken = generateToken(user._id, user.role)
+    setCookies(res, newToken, token)
     
     res.json({
       status: 'success',
-      data: { token: newToken },
+      data: { user },
     })
   } catch (error) {
     res.status(401).json({

@@ -3,7 +3,6 @@ import { useCallback } from 'react'
 import {
   selectUser,
   selectIsAuthenticated,
-  selectToken,
   selectRole,
   selectAuthLoading,
   selectAuthError,
@@ -18,7 +17,6 @@ export const useAuth = () => {
   const dispatch = useDispatch()
   const user = useSelector(selectUser)
   const isAuthenticated = useSelector(selectIsAuthenticated)
-  const token = useSelector(selectToken)
   const role = useSelector(selectRole)
   const loading = useSelector(selectAuthLoading)
   const error = useSelector(selectAuthError)
@@ -29,10 +27,8 @@ export const useAuth = () => {
       const response = await authService.login(credentials)
       
       if (response.success) {
-        const { user, token } = response.data
-        dispatch(setUser({ user, token }))
-        setItem('urbanmove-token', token)
-        setItem('urbanmove-user', user)
+        const { user } = response.data
+        dispatch(setUser(user))
         return { success: true, user }
       } else {
         throw new Error(response.message || 'Login failed')
@@ -51,10 +47,8 @@ export const useAuth = () => {
       const response = await authService.googleLogin(googleToken)
       
       if (response.success) {
-        const { user, token } = response.data
-        dispatch(setUser({ user, token }))
-        setItem('urbanmove-token', token)
-        setItem('urbanmove-user', user)
+        const { user } = response.data
+        dispatch(setUser(user))
         return { success: true, user }
       } else {
         throw new Error(response.message || 'Google login failed')
@@ -69,17 +63,13 @@ export const useAuth = () => {
 
   const logoutUser = useCallback(async () => {
     try {
-      if (token) {
-        await authService.logout()
-      }
+      await authService.logout()
     } catch (error) {
       console.error('Logout error:', error)
     } finally {
       dispatch(logout())
-      removeItem('urbanmove-token')
-      removeItem('urbanmove-user')
     }
-  }, [dispatch, token])
+  }, [dispatch])
 
   const clearAuthError = useCallback(() => {
     dispatch(clearError())
@@ -101,9 +91,7 @@ export const useAuth = () => {
     try {
       const response = await authService.refreshToken()
       if (response.success) {
-        const { token: newToken } = response.data
-        setItem('urbanmove-token', newToken)
-        return newToken
+        return true
       }
     } catch (error) {
       console.error('Token refresh error:', error)
@@ -116,7 +104,6 @@ export const useAuth = () => {
     // State
     user,
     isAuthenticated,
-    token,
     role,
     loading,
     error,
